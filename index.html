@@ -103,7 +103,10 @@
 
             runSimulator(numberSimulations = 100, targetPack = 'Charizard', language = 'en') {
                 const packsOpenedHistory = [];
+                $('#opened').text(''); 
+                $('#owned').text('Owned: 0/0'); 
                 const drawUntilAllPackOwned = $('#drawUntilAllPackOwned').is(':checked'); 
+
 
                 if (drawUntilAllPackOwned) {
                     const allCardsInPack = new Set(TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All').map(card => card.id));
