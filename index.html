@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,15 +14,18 @@
             line-height: 1.6;
             margin: 20px;
         }
+
         pre {
             background-color: #f4f4f4;
             padding: 10px;
             border-radius: 5px;
             overflow-x: auto;
         }
+
         h1 {
             color: #333;
         }
+
         #output {
             margin-top: 20px;
             border: 1px solid #ccc;
@@ -31,6 +35,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Pokemon TCG Pocket Unpack Simulator</h1>
 
@@ -38,7 +43,7 @@
         <label for="drawUntilAllPackOwned">Draw Until All Cards Owned in Pack:</label>
         <input type="checkbox" id="drawUntilAllPackOwned" />
     </div>
-     
+
     <div class="simulation-group" id="simulationGroup">
         <label for="numberSimulations" id="simulationsLabel">Simulations Count:</label>
         <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
@@ -60,16 +65,16 @@
             <option value="zhhk">正體中文 (香港)</option>
         </select>
     </div>
-    
+
     <button id="runSimulation">Start Unpacking</button>
     <table id="output">
         <div id="opened"></div>
         <div id="owned"></div>
         <thead>
             <tr>
-            <th style="text-align: left; width: 25%;">Name</th>
-            <th style="text-align: left; width: 25%;">Rarity</th>
-            <th style="text-align: left; width: 25%;">Count</th>
+                <th style="text-align: left; width: 25%;">Name</th>
+                <th style="text-align: left; width: 25%;">Rarity</th>
+                <th style="text-align: left; width: 25%;">Count</th>
             </tr>
         </thead>
         <tbody>
@@ -85,20 +90,20 @@
             static PACK_RATES = PACK_RATES;
             static DRAW_RATES = DRAW_RATES;
             static CARD_LIST = CARD_LIST;
-            
+
             openPack(targetPack, language) {
                 const drawnCards = {};
 
                 const filteredCards = TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All');
 
-                const isRarePack = Math.random() < TCGPSimulator.PACK_RATES[1]; 
+                const isRarePack = Math.random() < TCGPSimulator.PACK_RATES[1];
 
                 const drawRateKey = isRarePack ? 'rare' : 'regular';
                 const drawRates = TCGPSimulator.DRAW_RATES[drawRateKey];
 
-                for (const rate of drawRates) { 
+                for (const rate of drawRates) {
                     const card = this.randomChoice(filteredCards, targetPack, rate);
-                    const key = card.id; 
+                    const key = card.id;
                     drawnCards[key] = (drawnCards[key] || 0) + 1;
                 }
 
@@ -107,46 +112,46 @@
 
             runSimulator(numberSimulations = 100, targetPack = 'Charizard', language = 'en') {
                 const packsOpenedHistory = [];
-                $('#opened').text(''); 
-                $('#owned').text('Owned: 0/0'); 
-                const drawUntilAllPackOwned = $('#drawUntilAllPackOwned').is(':checked'); 
+                $('#opened').text('');
+                $('#owned').text('Owned: 0/0');
+                const drawUntilAllPackOwned = $('#drawUntilAllPackOwned').is(':checked');
 
 
                 if (drawUntilAllPackOwned) {
                     const allCardsInPack = new Set(TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All').map(card => card.id));
                     const ownedCards = new Set();
-                    let currentCount = 0; 
+                    let currentCount = 0;
 
                     while (ownedCards.size < allCardsInPack.size) {
                         const drawnCards = this.openPack(targetPack, language);
                         for (const cardId in drawnCards) {
-                            ownedCards.add(cardId); 
+                            ownedCards.add(cardId);
                         }
-                        packsOpenedHistory.push(drawnCards); 
-                        currentCount++; 
+                        packsOpenedHistory.push(drawnCards);
+                        currentCount++;
 
-                        $('#opened').text(`Opened: ${currentCount}`); 
+                        $('#opened').text(`Opened: ${currentCount}`);
 
-                    const packsPerDay = 2; // Number of packs opened each day
-                    const totalDays = Math.ceil(numberSimulations / packsPerDay); // Calculate total days based on simulations
-                    let currentDay = 0; // Initialize current day counter
+                        const packsPerDay = 2;
+                        const totalDays = Math.ceil(numberSimulations / packsPerDay);
+                        let currentDay = 0;
 
-                    while (ownedCards.size < allCardsInPack.size) {
-                        for (let i = 0; i < packsPerDay; i++) {
-                            const drawnCards = this.openPack(targetPack, language);
-                            for (const cardId in drawnCards) {
-                                ownedCards.add(cardId); 
+                        while (ownedCards.size < allCardsInPack.size) {
+                            for (let i = 0; i < packsPerDay; i++) {
+                                const drawnCards = this.openPack(targetPack, language);
+                                for (const cardId in drawnCards) {
+                                    ownedCards.add(cardId);
+                                }
+                                packsOpenedHistory.push(drawnCards);
                             }
-                            packsOpenedHistory.push(drawnCards); 
+                            currentDay++; // Increment the day counter
+                            $('#opened').text(`Opened: ${currentDay * packsPerDay} (Total Days: ${totalDays})`);
                         }
-                        currentDay++; // Increment the day counter
-                        $('#opened').text(`Opened: ${currentDay * packsPerDay} `); 
-                    }
                     }
                 } else {
                     for (let i = 0; i < numberSimulations; i++) {
                         const drawnCards = this.openPack(targetPack, language);
-                        packsOpenedHistory.push(drawnCards); 
+                        packsOpenedHistory.push(drawnCards);
                     }
                 }
 
@@ -192,7 +197,7 @@
                 sortedCards.forEach(({ name, rarity, count }) => {
                     // Only append if hideCommon is false or the card rarity is not common
                     if (!hideCommon || !['♢', '♢♢', '♢♢♢'].includes(rarity)) {
-                        $('#output tbody').append(`<tr><td>${name}</td><td>${rarity}</td><td>${count}</td></tr>`); 
+                        $('#output tbody').append(`<tr><td>${name}</td><td>${rarity}</td><td>${count}</td></tr>`);
                     }
                 });
 
@@ -217,7 +222,7 @@
                 }
             }
         }
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize DataTables before the button click
             $('#output').DataTable({
                 pageLength: 200, // Set the default showing to 100
@@ -228,12 +233,12 @@
                 info: false // Hide footer info
             });
 
-            $('#drawUntilAllPackOwned').on('change', function() {
+            $('#drawUntilAllPackOwned').on('change', function () {
                 const isChecked = $(this).is(':checked');
                 $('#simulationGroup').toggle(!isChecked); // Hide simulation group if checked
             });
 
-            $('#runSimulation').on('click', function() {
+            $('#runSimulation').on('click', function () {
                 $('#output tbody').empty(); // Clean the table before every run
                 const targetPack = $('#targetPack').val(); // Get the selected pack 
                 const language = $('#languageSelect').val(); // Get the selected language
@@ -249,4 +254,5 @@
         });
     </script>
 </body>
+
 </html>
