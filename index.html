@@ -33,30 +33,34 @@
 </head>
 <body>
     <h1>Pokemon TCG Pocket Unpack Simulator</h1>
+
+    <div class="checkbox-group">
+        <label for="drawUntilAllPackOwned">Draw Until All Cards Owned in Pack:</label>
+        <input type="checkbox" id="drawUntilAllPackOwned" />
+    </div>
+     
+    <div class="simulation-group" id="simulationGroup">
+        <label for="numberSimulations" id="simulationsLabel">Simulations Count:</label>
+        <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
+    </div>
+
+    <div class="pack-selection">
+        <label for="targetPack">Choose a pack to open:</label>
+        <select id="targetPack">
+            <option value="Charizard">Charizard</option>
+            <option value="Mewtwo">Mewtwo</option>
+            <option value="Pikachu">Pikachu</option>
+        </select>
+    </div>
+
+    <div class="language-selection">
+        <label for="languageSelect">Choose Language:</label>
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="zhhk">正體中文 (香港)</option>
+        </select>
+    </div>
     
-    <label for="numberSimulations">Simulations Count:</label>
-    <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
-    <br>
-
-    <label for="targetPack">Choose a pack to open:</label>
-    <select id="targetPack">
-        <option value="Charizard">Charizard</option>
-        <option value="Mewtwo">Mewtwo</option>
-        <option value="Pikachu">Pikachu</option>
-    </select>
-    <br>
-
-    <label for="languageSelect">Choose Language:</label>
-    <select id="languageSelect">
-        <option value="en">English</option>
-        <option value="zhhk">正體中文 (香港)</option>
-    </select>
-    <br>
-    
-    <label for="drawUntilAllPackOwned">Draw Until All Cards Owned in Pack:</label>
-    <input type="checkbox" id="drawUntilAllPackOwned" />
-    <br>
-
     <button id="runSimulation">Start Unpacking</button>
     <table id="output">
         <div id="opened"></div>
@@ -122,6 +126,22 @@
                         currentCount++; 
 
                         $('#opened').text(`Opened: ${currentCount}`); 
+
+                    const packsPerDay = 2; // Number of packs opened each day
+                    const totalDays = Math.ceil(numberSimulations / packsPerDay); // Calculate total days based on simulations
+                    let currentDay = 0; // Initialize current day counter
+
+                    while (ownedCards.size < allCardsInPack.size) {
+                        for (let i = 0; i < packsPerDay; i++) {
+                            const drawnCards = this.openPack(targetPack, language);
+                            for (const cardId in drawnCards) {
+                                ownedCards.add(cardId); 
+                            }
+                            packsOpenedHistory.push(drawnCards); 
+                        }
+                        currentDay++; // Increment the day counter
+                        $('#opened').text(`Opened: ${currentDay * packsPerDay} (Total Days: ${totalDays})`); 
+                    }
                     }
                 } else {
                     for (let i = 0; i < numberSimulations; i++) {
@@ -206,6 +226,11 @@
                 searching: false, // Hide search box
                 paging: false, // Hide pagination controls
                 info: false // Hide footer info
+            });
+
+            $('#drawUntilAllPackOwned').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                $('#simulationGroup').toggle(!isChecked); // Hide simulation group if checked
             });
 
             $('#runSimulation').on('click', function() {
