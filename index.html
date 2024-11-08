@@ -64,7 +64,6 @@
         <thead>
             <tr>
             <th style="text-align: left; width: 25%;">Name</th>
-            <th style="text-align: left; width: 25%;">Pack</th>
             <th style="text-align: left; width: 25%;">Rarity</th>
             <th style="text-align: left; width: 25%;">Count</th>
             </tr>
@@ -170,7 +169,7 @@
                 sortedCards.forEach(({ name, rarity, count }) => {
                     // Only append if hideCommon is false or the card rarity is not common
                     if (!hideCommon || !['♢', '♢♢', '♢♢♢'].includes(rarity)) {
-                        $('#output tbody').append(`<tr><td>${name}</td><td>${targetPack}</td><td>${rarity}</td><td>${count}</td></tr>`); 
+                        $('#output tbody').append(`<tr><td>${name}</td><td>${rarity}</td><td>${count}</td></tr>`); 
                     }
                 });
 
