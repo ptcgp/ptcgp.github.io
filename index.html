@@ -49,6 +49,23 @@
         <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
     </div>
 
+    <div class="checkbox-group" id="dailyQuestGroup" style="display: none;">
+        <label for="dailyQuest">Complete Daily Quest:</label>
+        <input type="checkbox" id="dailyQuest" />
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#drawUntilAllPackOwned').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#dailyQuestGroup').show();
+                } else {
+                    $('#dailyQuestGroup').hide();
+                }
+            });
+        });
+    </script>
+
     <div class="pack-selection">
         <label for="targetPack">Choose a pack to open:</label>
         <select id="targetPack">
@@ -130,23 +147,14 @@
                         packsOpenedHistory.push(drawnCards);
                         currentCount++;
 
-                        $('#opened').text(`Opened: ${currentCount}`);
-
                         const packsPerDay = 2;
-                        const totalDays = Math.ceil(numberSimulations / packsPerDay);
-                        let currentDay = 0;
+                        const dailyQuest = $('#dailyQuest').is(':checked'); 
+                        const adjustedPacksPerDay = packsPerDay + (dailyQuest ? (1 / 3) : 0);
 
-                        while (ownedCards.size < allCardsInPack.size) {
-                            for (let i = 0; i < packsPerDay; i++) {
-                                const drawnCards = this.openPack(targetPack, language);
-                                for (const cardId in drawnCards) {
-                                    ownedCards.add(cardId);
-                                }
-                                packsOpenedHistory.push(drawnCards);
-                            }
-                            currentDay++; // Increment the day counter
-                            $('#opened').text(`Opened: ${currentDay * packsPerDay}`);
-                        }
+                        console.log(adjustedPacksPerDay);
+                        const totalDays = Math.ceil(currentCount / adjustedPacksPerDay);
+
+                        $('#opened').text(`Opened: ${currentCount} (Total Days: ${totalDays})`);
                     }
                 } else {
                     for (let i = 0; i < numberSimulations; i++) {
