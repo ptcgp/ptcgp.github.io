@@ -55,8 +55,8 @@
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#drawUntilAllPackOwned').change(function() {
+        $(document).ready(function () {
+            $('#drawUntilAllPackOwned').change(function () {
                 if ($(this).is(':checked')) {
                     $('#dailyQuestGroup').show();
                 } else {
@@ -69,13 +69,13 @@
     <div class="pack-selection">
         <label for="targetPack">Choose a pack to open:</label>
         <select id="targetPack">
+            <option value="Mewtwo">Mewtwo</option>
             <option value="Charizard">Charizard</option>
-            <!-- <option value="Mewtwo">Mewtwo</option> -->
             <option value="Pikachu">Pikachu</option>
         </select>
     </div>
 
-    <div class="language-selection">
+    <div class="language-selection" style="display: none;">
         <label for="languageSelect">Choose Language:</label>
         <select id="languageSelect">
             <option value="en">English</option>
@@ -130,41 +130,47 @@
             runSimulator(numberSimulations = 100, targetPack = 'Charizard', language = 'en') {
                 const packsOpenedHistory = [];
                 $('#opened').text('');
-                $('#owned').text('Owned: 0/0');
                 const drawUntilAllPackOwned = $('#drawUntilAllPackOwned').is(':checked');
 
-
                 if (drawUntilAllPackOwned) {
-                    const allCardsInPack = new Set(TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All').map(card => card.id));
-                    const ownedCards = new Set();
-                    let currentCount = 0;
-
-                    while (ownedCards.size < allCardsInPack.size) {
-                        const drawnCards = this.openPack(targetPack, language);
-                        for (const cardId in drawnCards) {
-                            ownedCards.add(cardId);
-                        }
-                        packsOpenedHistory.push(drawnCards);
-                        currentCount++;
-
-                        const packsPerDay = 2;
-                        const dailyQuest = $('#dailyQuest').is(':checked'); 
-                        const adjustedPacksPerDay = packsPerDay + (dailyQuest ? (1 / 3) : 0);
-
-                        console.log(adjustedPacksPerDay);
-                        const totalDays = Math.ceil(currentCount / adjustedPacksPerDay);
-
-                        $('#opened').text(`Opened: ${currentCount} (Total Days: ${totalDays})`);
-                    }
+                    this.simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language);
                 } else {
-                    for (let i = 0; i < numberSimulations; i++) {
-                        const drawnCards = this.openPack(targetPack, language);
-                        packsOpenedHistory.push(drawnCards);
-                    }
+                    this.simulateFixedCount(packsOpenedHistory, numberSimulations, targetPack, language);
                 }
 
                 // Update the output table after all simulations
                 this.updateOutputTable(packsOpenedHistory, targetPack, language);
+            }
+
+            simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language) {
+                const allCardsInPack = new Set(TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All').map(card => card.id));
+                const ownedCards = new Set();
+                let currentCount = 0;
+
+                while (ownedCards.size < allCardsInPack.size) {
+                    const drawnCards = this.openPack(targetPack, language);
+                    for (const cardId in drawnCards) {
+                        ownedCards.add(cardId);
+                    }
+                    packsOpenedHistory.push(drawnCards);
+                    currentCount++;
+                    this.updateOpenedCount(currentCount, targetPack);
+                }
+            }
+
+            simulateFixedCount(packsOpenedHistory, numberSimulations, targetPack, language) {
+                for (let i = 0; i < numberSimulations; i++) {
+                    const drawnCards = this.openPack(targetPack, language);
+                    packsOpenedHistory.push(drawnCards);
+                }
+            }
+
+            updateOpenedCount(currentCount, targetPack) {
+                const packsPerDay = 2;
+                const dailyQuest = $('#dailyQuest').is(':checked');
+                const adjustedPacksPerDay = packsPerDay + (dailyQuest ? (1 / 3) : 0);
+                const totalDays = Math.ceil(currentCount / adjustedPacksPerDay);
+                $('#opened').text(`Opened: ${currentCount} (Total Days: ${totalDays})`);
             }
 
             updateOutputTable(packsOpenedHistory, targetPack, language) {
@@ -184,29 +190,19 @@
                     }
                 });
 
-                // Ensure all rarities are accounted for, including those with missing rarity
-                const hideCommon = $('#hideCommonCards').is(':checked'); // Check if the hide common cards option is selected
-
                 // Create an array from the final drawn cards for sorting
                 const sortedCards = Object.entries(finalDrawnCards).map(([key, count]) => {
                     const card = TCGPSimulator.CARD_LIST.find(c => c.id === key);
-                    const name = card ? card[`name-${language}`] : 'Unknown Card';
-                    const rarity = card ? card.rarity : 'Unknown Rarity';
-                    return { name, rarity, count };
+                    return { card, count };
                 });
 
-                // Sort the cards by rarity and then by count in ascending order
                 sortedCards.sort((a, b) => {
-                    const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.rarity) - TCGPSimulator.RARITIES.indexOf(a.rarity);
+                    const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.card.rarity) - TCGPSimulator.RARITIES.indexOf(a.card.rarity);
                     return rarityComparison !== 0 ? rarityComparison : b.count - a.count;
                 });
 
-                // Update the output table
-                sortedCards.forEach(({ name, rarity, count }) => {
-                    // Only append if hideCommon is false or the card rarity is not common
-                    if (!hideCommon || !['♢', '♢♢', '♢♢♢'].includes(rarity)) {
-                        $('#output tbody').append(`<tr><td>${name}</td><td>${rarity}</td><td>${count}</td></tr>`);
-                    }
+                sortedCards.forEach(({ card, count }) => {
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td></tr>`);
                 });
 
                 // Display the owned count
