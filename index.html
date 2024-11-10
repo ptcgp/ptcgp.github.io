@@ -54,6 +54,12 @@
         <input type="checkbox" id="completeDailyQuest" />
     </div>
 
+    <div class="checkbox-group" id="dailyThanksGroup" style="display: none;">
+        <label for="completeDailyThanks">Complete Daily Thanks:</label>
+        <input type="checkbox" id="completeDailyThanks" />
+    </div>
+
+
     <div class="checkbox-group" id="excludeRarityGroup">
         <label for="excludeCrownCards">Exclude Crown ♛ Cards:</label>
         <input type="checkbox" id="excludeCrownCards" />
@@ -68,6 +74,7 @@
         $(document).ready(function () {
             $('#drawUntilAllCardsOwned').change(function () {
                 $('#dailyQuestGroup').toggle(this.checked);
+                $('#dailyThanksGroup').toggle(this.checked);
                 $('#simulationGroup').toggle(!this.checked); // Hide simulation group if checked
             });
         });
@@ -161,7 +168,9 @@
             }
 
             updateOpenedCount(currentCount, targetPack) {
-                const adjustedPacksPerDay = 2 + 1/12 + ($('#completeDailyQuest').is(':checked') ? (1 / 3) : 0);
+                const adjustedPacksPerDay = (24 
+                        + ($('#completeDailyQuest').is(':checked') ? 4 : 0) 
+                        + ($('#completeDailyThanks').is(':checked') ? 2 : 0)) / 12;
                 $('#opened').text(`Opened: ${currentCount} (Total Days: ${Math.ceil(currentCount / adjustedPacksPerDay)})`);
             }
 
