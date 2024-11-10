@@ -67,11 +67,8 @@
     <script>
         $(document).ready(function () {
             $('#drawUntilAllCardsOwned').change(function () {
-                if ($(this).is(':checked')) {
-                    $('#dailyQuestGroup').show();
-                } else {
-                    $('#dailyQuestGroup').hide();
-                }
+                $('#dailyQuestGroup').toggle(this.checked);
+                $('#simulationGroup').toggle(!this.checked); // Hide simulation group if checked
             });
         });
     </script>
@@ -110,7 +107,7 @@
     </table>
 
     <script type="module">
-        import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST } from './data.js'; // Import all card data at once
+        import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST } from './data.js';
 
         class TCGPSimulator {
             static RARITIES = RARITIES;
@@ -120,19 +117,13 @@
 
             openPack(targetPack, language) {
                 const drawnCards = {};
-
                 const filteredCards = TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All');
+                const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
 
-                const isRarePack = Math.random() < TCGPSimulator.PACK_RATES[1];
-
-                const drawRateKey = isRarePack ? 'rare' : 'regular';
-                const drawRates = TCGPSimulator.DRAW_RATES[drawRateKey];
-
-                for (const rate of drawRates) {
+                drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, targetPack, rate);
-                    const key = card.id;
-                    drawnCards[key] = (drawnCards[key] || 0) + 1;
-                }
+                    drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
+                });
 
                 return drawnCards;
             }
@@ -142,13 +133,7 @@
                 $('#opened').text('');
                 const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
 
-                if (drawUntilAllCardsOwned) {
-                    this.simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language);
-                } else {
-                    this.simulateFixedCount(packsOpenedHistory, numberSimulations, targetPack, language);
-                }
-
-                // Update the output table after all simulations
+                drawUntilAllCardsOwned ? this.simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language) : this.simulateFixedCount(packsOpenedHistory, numberSimulations, targetPack, language);
                 this.updateOutputTable(packsOpenedHistory, targetPack, language);
             }
 
@@ -156,29 +141,13 @@
                 const ownedCards = new Set();
                 let currentCount = 0;
 
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                const excludeStarCards = $('#excludeStarCards').is(':checked');
-
-                const filteredCards = TCGPSimulator.CARD_LIST.filter(card =>
-                    (card.pack === targetPack || card.pack === 'All') &&
-                    (!excludeCrownCards || card.rarity !== '♛') &&
-                    (!excludeStarCards || !card.rarity.startsWith('☆'))
-                );
-
-                console.log(filteredCards.length);
-
+                const filteredCards = this.getFilteredCards(targetPack);
                 while (ownedCards.size < filteredCards.length) {
                     const drawnCards = this.openPack(targetPack, language);
-                    for (const cardId in drawnCards) {
-                        const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                        const excludeStarCards = $('#excludeStarCards').is(':checked');
+                    Object.keys(drawnCards).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (!excludeCrownCards || card.rarity !== '♛') {
-                            if (!excludeStarCards || !card.rarity.startsWith('☆')) {
-                                ownedCards.add(cardId);
-                            }
-                        }
-                    }
+                        if (this.isCardOwned(card)) ownedCards.add(cardId);
+                    });
                     packsOpenedHistory.push(drawnCards);
                     currentCount++;
                     this.updateOpenedCount(currentCount, targetPack);
@@ -187,81 +156,84 @@
 
             simulateFixedCount(packsOpenedHistory, numberSimulations, targetPack, language) {
                 for (let i = 0; i < numberSimulations; i++) {
-                    const drawnCards = this.openPack(targetPack, language);
-                    packsOpenedHistory.push(drawnCards);
+                    packsOpenedHistory.push(this.openPack(targetPack, language));
                 }
             }
 
             updateOpenedCount(currentCount, targetPack) {
-                const packsPerDay = 2;
-                const dailyQuest = $('#completeDailyQuest').is(':checked');
-                const adjustedPacksPerDay = packsPerDay + (dailyQuest ? (1 / 3) : 0);
-                const totalDays = Math.ceil(currentCount / adjustedPacksPerDay);
-                $('#opened').text(`Opened: ${currentCount} (Total Days: ${totalDays})`);
+                const adjustedPacksPerDay = 2 + ($('#completeDailyQuest').is(':checked') ? (1 / 3) : 0);
+                $('#opened').text(`Opened: ${currentCount} (Total Days: ${Math.ceil(currentCount / adjustedPacksPerDay)})`);
             }
 
             updateOutputTable(packsOpenedHistory, targetPack, language) {
-                const finalDrawnCards = {};
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                const excludeStarCards = $('#excludeStarCards').is(':checked');
-
-                const filteredCards = TCGPSimulator.CARD_LIST.filter(card =>
-                    (card.pack === targetPack || card.pack === 'All') &&
-                    (!excludeCrownCards || card.rarity !== '♛') &&
-                    (!excludeStarCards || !card.rarity.startsWith('☆'))
-                );
-                const totalCardsInPack = filteredCards.length;
-
-                // Aggregate results from all opened packs
-                packsOpenedHistory.forEach(drawnCards => {
-                    for (const cardId in drawnCards) {
-                        const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (card) {
-                            const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                            const key = card.id;
-                            finalDrawnCards[key] = (finalDrawnCards[key] || 0) + drawnCards[cardId];
-                        }
-                    }
-                });
-
-                // Create an array from the final drawn cards for sorting
-                const sortedCards = Object.entries(finalDrawnCards).map(([key, count]) => {
-                    const card = TCGPSimulator.CARD_LIST.find(c => c.id === key);
-                    return { card, count };
-                });
-
-                sortedCards.sort((a, b) => {
-                    const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.card.rarity) - TCGPSimulator.RARITIES.indexOf(a.card.rarity);
-                    return rarityComparison !== 0 ? rarityComparison : b.count - a.count;
-                });
-
+                const finalDrawnCards = this.aggregateDrawnCards(packsOpenedHistory);
+                const sortedCards = this.sortCards(finalDrawnCards);
                 sortedCards.forEach(({ card, count }) => {
                     $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td></tr>`);
                 });
-
-                // Display the owned count
-                const filteredOwnedCount = Object.keys(finalDrawnCards).filter(cardId => {
-                    const card = TCGPSimulator.CARD_LIST.find(card => card.id === cardId);
-                    const isCrownCard = excludeCrownCards && card.rarity === '♛';
-                    const isStarCard = excludeStarCards && card.rarity.startsWith('☆');
-                    return !(isCrownCard || isStarCard);
-                }).length;
-                $('#owned').text(`Owned: ${filteredOwnedCount}/${totalCardsInPack}`);
+                $('#owned').text(`Owned: ${this.getOwnedCount(finalDrawnCards)}/${this.getTotalCardsInPack(targetPack)}`);
                 $('#output').append(`</table><br>`);
             }
 
             randomChoice(array, targetPack, weights) {
-                const randomNum = Math.random() * 1;
+                const randomNum = Math.random();
                 let cumulativeWeight = 0;
                 for (let i = 0; i < array.length; i++) {
                     cumulativeWeight += weights[i];
                     if (randomNum < cumulativeWeight) {
                         const filteredCards = array.filter(card => card.rarity === TCGPSimulator.RARITIES[i]);
-                        const randomIndex = Math.floor(Math.random() * filteredCards.length);
-                        const chosenCard = filteredCards[randomIndex];
-                        return chosenCard;
+                        return filteredCards[Math.floor(Math.random() * filteredCards.length)];
                     }
                 }
+            }
+
+            getFilteredCards(targetPack) {
+                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
+                const excludeStarCards = $('#excludeStarCards').is(':checked');
+                return TCGPSimulator.CARD_LIST.filter(card =>
+                    (card.pack === targetPack || card.pack === 'All') &&
+                    (!excludeCrownCards || card.rarity !== '♛') &&
+                    (!excludeStarCards || !card.rarity.startsWith('☆'))
+                );
+            }
+
+            isCardOwned(card) {
+                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
+                const excludeStarCards = $('#excludeStarCards').is(':checked');
+                return (!excludeCrownCards || card.rarity !== '♛') && (!excludeStarCards || !card.rarity.startsWith('☆'));
+            }
+
+            aggregateDrawnCards(packsOpenedHistory) {
+                return packsOpenedHistory.reduce((acc, drawnCards) => {
+                    Object.keys(drawnCards).forEach(cardId => {
+                        const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
+                        if (card) {
+                            acc[card.id] = (acc[card.id] || 0) + drawnCards[cardId];
+                        }
+                    });
+                    return acc;
+                }, {});
+            }
+
+            sortCards(finalDrawnCards) {
+                return Object.entries(finalDrawnCards).map(([key, count]) => {
+                    const card = TCGPSimulator.CARD_LIST.find(c => c.id === key);
+                    return { card, count };
+                }).sort((a, b) => {
+                    const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.card.rarity) - TCGPSimulator.RARITIES.indexOf(a.card.rarity);
+                    return rarityComparison !== 0 ? rarityComparison : b.count - a.count;
+                });
+            }
+
+            getOwnedCount(finalDrawnCards) {
+                return Object.keys(finalDrawnCards).filter(cardId => {
+                    const card = TCGPSimulator.CARD_LIST.find(card => card.id === cardId);
+                    return this.isCardOwned(card);
+                }).length;
+            }
+
+            getTotalCardsInPack(targetPack) {
+                return this.getFilteredCards(targetPack).length;
             }
         }
         $(document).ready(function () {
