@@ -161,7 +161,7 @@
             }
 
             updateOpenedCount(currentCount, targetPack) {
-                const adjustedPacksPerDay = 2 + ($('#completeDailyQuest').is(':checked') ? (1 / 3) : 0);
+                const adjustedPacksPerDay = 2 + 1/12 + ($('#completeDailyQuest').is(':checked') ? (1 / 3) : 0);
                 $('#opened').text(`Opened: ${currentCount} (Total Days: ${Math.ceil(currentCount / adjustedPacksPerDay)})`);
             }
 
