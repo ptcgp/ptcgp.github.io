@@ -60,6 +60,11 @@
         <input type="checkbox" id="completeDailyThanks" />
         <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
+    
+    <div class="checkbox-group" id="ownEachCardGroup" style="display: none;">
+        <label for="ownEachCardCheckbox">Own each thankscard x2:</label>
+        <input type="checkbox" id="ownEachCardCheckbox" />
+    </div>
 
     <div class="checkbox-group" id="excludeRarityGroup">
         <label for="excludeCrownCards">Exclude Crown ♛ Cards:</label>
@@ -78,11 +83,13 @@
             const $simulationGroup = $('#simulationGroup');
             const $dailyQuestGroup = $('#dailyQuestGroup');
             const $dailyThanksGroup = $('#dailyThanksGroup');
+            const $ownEachCardGroup = $('#ownEachCardGroup');
 
             $drawUntilAllCardsOwned.change(function () {
                 const isChecked = this.checked;
                 $dailyQuestGroup.toggle(isChecked);
                 $dailyThanksGroup.toggle(isChecked);
+                $ownEachCardGroup.toggle(isChecked); 
                 $simulationGroup.toggle(!isChecked); 
 
             });
