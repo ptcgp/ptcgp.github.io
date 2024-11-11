@@ -9,30 +9,10 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-        }
-
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        #output {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 200px;
-            overflow-y: auto;
-        }
+        body { font-family: Arial; margin: 20px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        h1 { color: #333; }
+        #output { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
     </style>
 </head>
 
@@ -56,42 +36,37 @@
     </div>
 
     <div class="checkbox-group" id="simulationGroup">
-        <label for="numberSimulations" id="simulationsLabel">Simulations Count:</label>
+        <label for="numberSimulations">Simulations Count:</label>
         <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
     </div>
 
     <div class="checkbox-group" id="dailyQuestGroup" style="display: none;">
         <label for="completeDailyQuest">Complete Daily Quest:</label>
         <input type="checkbox" id="completeDailyQuest" />
-        <span class="info-icon-tooltip" data-tooltip="dailyQuest" style="cursor: pointer; margin-left: 5px;"
-            title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="dailyQuest" title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="dailyThanksGroup" style="display: none;">
         <label for="completeDailyThanks">Complete Daily Thanks:</label>
         <input type="checkbox" id="completeDailyThanks" />
-        <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;"
-            title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="dailyThanks" title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="drawEachCardTwiceGroup" style="display: none;">
         <label for="drawEachCardTwiceCheckbox">Draw each card x2:</label>
         <input type="checkbox" id="drawEachCardTwiceCheckbox" />
-        <span class="info-icon-tooltip" data-tooltip="drawEachCardTwice" style="cursor: pointer; margin-left: 5px;"
-            title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="drawEachCardTwice" title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="excludeRarityGroup">
         <label for="excludeCrownCards">Exclude Crown ♛ Cards:</label>
         <input type="checkbox" id="excludeCrownCards" />
-        <span class="info-icon-tooltip" data-tooltip="excludeCrown" style="cursor: pointer; margin-left: 5px;"
-            title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="excludeCrown" title="Click for more info">ℹ️</span>
         <br>
 
         <label for="excludeStarCards">Exclude Star ☆ Cards:</label>
         <input type="checkbox" id="excludeStarCards" />
-        <span class="info-icon-tooltip" data-tooltip="excludeStar" style="cursor: pointer; margin-left: 5px;"
-            title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="excludeStar" title="Click for more info">ℹ️</span>
     </div>
 
     <script>
@@ -157,20 +132,17 @@
 
     <script>
         $(document).ready(function () {
-            // Function to handle tooltip popups
             function setupTooltip(selector, message) {
                 $(selector).on('click', function () {
                     alert(message);
                 });
             }
 
-            // Set up tooltips
             setupTooltip('.info-icon-tooltip[data-tooltip="dailyQuest"]', 'Free Hourglass x4 after completing the daily quest.');
-            setupTooltip('.info-icon-tooltip[data-tooltip="dailyThanks"]', 'Free Shop ticket x5 after receiving the Thanks or Likes for 5 times. (Which is 1.67 Hourglass / days in total)');
-            setupTooltip('.info-icon-tooltip[data-tooltip="excludeCrown"]', 'Exclude Crown ♛ Cards when counting the number of cards owned. You can still draw them.');
-            setupTooltip('.info-icon-tooltip[data-tooltip="excludeStar"]', 'Exclude Star ☆ Cards when counting the number of cards owned. You can still draw them.');
+            setupTooltip('.info-icon-tooltip[data-tooltip="dailyThanks"]', 'Free Shop ticket x5 after receiving Thanks or Likes 5 times. (1.67 Hourglass / days in total)');
+            setupTooltip('.info-icon-tooltip[data-tooltip="excludeCrown"]', 'Exclude Crown ♛ Cards when counting owned cards. You can still draw them.');
+            setupTooltip('.info-icon-tooltip[data-tooltip="excludeStar"]', 'Exclude Star ☆ Cards when counting owned cards. You can still draw them.');
             setupTooltip('.info-icon-tooltip[data-tooltip="drawEachCardTwice"]', 'Will only count as owned if the card is drawn twice.');
-
         });
     </script>
 
@@ -183,8 +155,11 @@
             static DRAW_RATES = DRAW_RATES;
             static CARD_LIST = CARD_LIST;
 
+            constructor() {
+                this.drawCounts = {};
+            }
+
             openPack(targetPack, language) {
-                //console.log(`Opening pack: ${targetPack}, Language: ${language}`);
                 const drawnCards = {};
                 const filteredCards = TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All');
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
@@ -199,7 +174,6 @@
             }
 
             runSimulator(numberSimulations = 100, targetPack = 'Charizard', language = 'en') {
-                console.log(`Running simulator with ${numberSimulations} simulations for pack: ${targetPack}, Language: ${language}`);
                 const packsOpenedHistory = [];
                 $('#opened').text('');
                 const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
@@ -208,55 +182,36 @@
                 this.updateOutputTable(packsOpenedHistory, targetPack, language);
             }
 
-
             simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language, completedPacks = [], allOwnedCards = new Set()) {
-                console.log(`Simulating until all cards owned for pack: ${targetPack}, Language: ${language}`);
                 let currentCount = 0;
-                const completenessPercentage = $('#completenessSlider').val(); // Get the selected completeness percentage
-
+                const completenessPercentage = $('#completenessSlider').val();
                 const filteredCards = this.getFilteredCards(targetPack);
-
-                var nextPack = ""
-
                 let ownedCards = new Set();
-                
+
                 while (ownedCards.size < filteredCards.length) {
                     const drawnCards = this.openPack(targetPack, language);
-                    //console.log(`Drawn cards: ${JSON.stringify(drawnCards)}`);
                     Object.keys(drawnCards).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (this.isCardOwned(card))
-                            ownedCards.add(cardId);
+                        if (this.isCardOwned(card)) ownedCards.add(cardId);
                     });
                     packsOpenedHistory.push(drawnCards);
                     currentCount++;
                     this.updateOpenedCount(currentCount, targetPack);
 
-                    // Check if the owned card percentage exceeds the selected percentage
                     const ownedPercentage = (ownedCards.size / filteredCards.length) * 100;
                     if (ownedPercentage >= completenessPercentage) {
-                        console.log(`Owned ${ownedCards.size} cards of ${filteredCards.length} cards.`);
-
                         if ($('#completeAllPacks').is(':checked')) {
-                            completedPacks.push(targetPack); // Record the completed pack
-
+                            completedPacks.push(targetPack);
                             const availablePacks = $('#targetPack option').map(function () {
                                 return $(this).val();
                             }).get().filter(pack => !completedPacks.includes(pack));
 
                             if (availablePacks.length > 0) {
-                                const firstPack = availablePacks[0];
-                                nextPack = firstPack;
-                            } else {
-                                break;
+                                const nextPack = availablePacks[0];
+                                this.simulateUntilAllCardsOwned(packsOpenedHistory, nextPack, language, completedPacks, ownedCards);
                             }
                         }
                     }
-                }
-
-                if (nextPack !== "") {
-                    allOwnedCards = new Set([...allOwnedCards, ...ownedCards]);
-                    this.simulateUntilAllCardsOwned(packsOpenedHistory, nextPack, language, completedPacks, allOwnedCards);
                 }
             }
 
@@ -267,24 +222,17 @@
             }
 
             updateOpenedCount(currentCount, targetPack) {
-                console.log(`Current count of opened packs: ${currentCount}, Target pack: ${targetPack}`);
-                const adjustedPacksPerDay = (24 // base
-                    + (1 / 3) // daily shop free ticket
-                    + ($('#completeDailyQuest').is(':checked') ? 4 : 0)  // daily quest
-                    + ($('#completeDailyThanks').is(':checked') ? (5 / 6) : 0))   // daily thanks ticket
-                    / 12;
+                const adjustedPacksPerDay = (24 + (1 / 3) + ($('#completeDailyQuest').is(':checked') ? 4 : 0) + ($('#completeDailyThanks').is(':checked') ? (5 / 6) : 0)) / 12;
                 $('#opened').text(`Opened: ${currentCount} (Total Days: ${Math.ceil(currentCount / adjustedPacksPerDay)})`);
             }
 
             updateOutputTable(packsOpenedHistory, targetPack, language) {
-                console.log(`Updating output table for pack: ${targetPack}, Language: ${language}`);
                 const finalDrawnCards = this.aggregateDrawnCards(packsOpenedHistory);
                 const sortedCards = this.sortCards(finalDrawnCards);
                 sortedCards.forEach(({ card, count }) => {
                     $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
                 });
                 $('#owned').text(`Owned: ${this.getOwnedCount(finalDrawnCards)}/${this.getTotalCardsInPack(targetPack)}`);
-                $('#output').append(`</table><br>`);
             }
 
             randomChoice(array, targetPack, weights) {
@@ -315,8 +263,7 @@
                 const drawCount = this.getDrawCount(card.id);
                 const drawEachCardTwiceChecked = $('#drawEachCardTwiceCheckbox').is(':checked');
 
-                if (excludeCrown || excludeStar) return false;
-                return drawEachCardTwiceChecked ? drawCount >= 2 : true;
+                return !(excludeCrown || excludeStar) && (drawEachCardTwiceChecked ? drawCount >= 2 : true);
             }
 
             getDrawCount(cardId) {
@@ -354,40 +301,39 @@
 
             getTotalCardsInPack(targetPack) {
                 const isCompleteAllPacks = $('#completeAllPacks').is(':checked');
-                return isCompleteAllPacks ? TCGPSimulator.CARD_LIST.filter(card => card.pack !== 'Unlocked').length : this.getFilteredCards(targetPack).length;
-            }
+                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
+                const excludeStarCards = $('#excludeStarCards').is(':checked');
 
-            constructor() {
-                this.drawCounts = {};
+                return isCompleteAllPacks 
+                    ? TCGPSimulator.CARD_LIST.filter(card => 
+                        card.pack !== 'Unlocked' && 
+                        (!excludeCrownCards || card.rarity !== '♛') && 
+                        (!excludeStarCards || !card.rarity.startsWith('☆'))
+                    ).length 
+                    : this.getFilteredCards(targetPack).length;
             }
         }
-        $(document).ready(function () {
-            // Initialize DataTables before the button click
-            $('#output').DataTable({
-                pageLength: 200, // Set the default showing to 100
-                ordering: false, // Disable sorting
-                lengthChange: false, // Hide page size select
-                searching: false, // Hide search box
-                paging: false, // Hide pagination controls
-                info: false // Hide footer info
-            });
 
-            $('#drawUntilAllCardsOwned').on('change', function () {
-                const isChecked = $(this).is(':checked');
-                $('#simulationGroup').toggle(!isChecked); // Hide simulation group if checked
+        $(document).ready(function () {
+            $('#output').DataTable({
+                pageLength: 200,
+                ordering: false,
+                lengthChange: false,
+                searching: false,
+                paging: false,
+                info: false
             });
 
             $('#runSimulation').on('click', function () {
-                $('#output tbody').empty(); // Clean the table before every run
-                const targetPack = $('#targetPack').val(); // Get the selected pack 
-                const language = $('#languageSelect').val(); // Get the selected language
-                const numberSimulations = $('#numberSimulations').val(); // Get the number of simulations
+                $('#output tbody').empty();
+                const targetPack = $('#targetPack').val();
+                const language = $('#languageSelect').val();
+                const numberSimulations = $('#numberSimulations').val();
                 const openingSimulator = new TCGPSimulator();
-                openingSimulator.runSimulator(numberSimulations, targetPack, language); // Pass the selected pack to run
+                openingSimulator.runSimulator(numberSimulations, targetPack, language);
 
-                // Reset DataTable before initializing
                 if ($.fn.DataTable.isDataTable('#output')) {
-                    $('#output').DataTable().clear(); // Clear and destroy existing DataTable
+                    $('#output').DataTable().clear();
                 }
             });
         });
