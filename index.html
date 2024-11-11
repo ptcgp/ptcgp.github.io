@@ -44,16 +44,16 @@
         <input type="checkbox" id="drawUntilAllCardsOwned" />
     </div>
 
-    <div class="checkbox-group" style="display: none;">
+    <div class="checkbox-group" id="completeAllPacksGroup" style="display: none;">
+        <label for="completeAllPacks">Complete All Packs:</label>
+        <input type="checkbox" id="completeAllPacks" checked />
+    </div>
+
+    <div class="checkbox-group" id="completenessSliderGroup" style="display: none;">
         <label for="completenessSlider">Select Completeness:</label>
         <input type="range" id="completenessSlider" min="0" max="100" value="100" />
         <span id="completenessValue">100%</span>
     </div>
-    <script>
-        $('#completenessSlider').on('input', function() {
-            $('#completenessValue').text(this.value + '%');
-        });
-    </script>
 
     <div class="checkbox-group" id="simulationGroup">
         <label for="numberSimulations" id="simulationsLabel">Simulations Count:</label>
@@ -92,25 +92,25 @@
     <script>
         $(document).ready(function () {
             const $drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned');
+            const $completeAllPacksGroup = $('#completeAllPacksGroup');
             const $simulationGroup = $('#simulationGroup');
             const $dailyQuestGroup = $('#dailyQuestGroup');
             const $dailyThanksGroup = $('#dailyThanksGroup');
             const $ownEachCardGroup = $('#drawEachCardTwiceGroup');
-            const $completenessSlider = $('#completenessSlider');
-            const $completenessGroup = $('.checkbox-group').filter(function() {
-                return $(this).find('input[type="range"]').length > 0;
-            });
+            const $completenessSliderGroup = $('#completenessSliderGroup');
+            
 
             $drawUntilAllCardsOwned.change(function () {
                 const isChecked = this.checked;
+                $completeAllPacksGroup.toggle(isChecked);
+                $completenessSliderGroup.toggle(isChecked); 
                 $dailyQuestGroup.toggle(isChecked);
                 $dailyThanksGroup.toggle(isChecked);
                 $ownEachCardGroup.toggle(isChecked); 
                 $simulationGroup.toggle(!isChecked); 
-                $completenessGroup.toggle(isChecked); 
             });
 
-            $completenessSlider.on('input', function() {
+            $('#completenessSlider').on('input', function() {
                 $('#completenessValue').text(this.value + '%');
             });
         });
