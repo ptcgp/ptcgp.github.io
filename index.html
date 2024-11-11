@@ -200,8 +200,11 @@
             simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language) {
                 const ownedCards = new Set();
                 let currentCount = 0;
+                const completenessPercentage = $('#completenessSlider').val(); // Get the selected completeness percentage
 
                 const filteredCards = this.getFilteredCards(targetPack);
+                const totalCards = filteredCards.length;
+
                 while (ownedCards.size < filteredCards.length) {
                     const drawnCards = this.openPack(targetPack, language);
                     Object.keys(drawnCards).forEach(cardId => {
@@ -212,6 +215,12 @@
                     packsOpenedHistory.push(drawnCards);
                     currentCount++;
                     this.updateOpenedCount(currentCount, targetPack);
+
+                    // Check if the owned card percentage exceeds the selected percentage
+                    const ownedPercentage = (ownedCards.size / totalCards) * 100;
+                    if (ownedPercentage > completenessPercentage) {
+                        break; // Stop if the owned percentage exceeds the selected percentage
+                    }
                 }
             }
 
