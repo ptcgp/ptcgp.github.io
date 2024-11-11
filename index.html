@@ -44,7 +44,7 @@
         <input type="checkbox" id="drawUntilAllCardsOwned" />
     </div>
 
-    <div class="simulation-group" id="simulationGroup">
+    <div class="checkbox-group" id="simulationGroup">
         <label for="numberSimulations" id="simulationsLabel">Simulations Count:</label>
         <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
     </div>
@@ -81,7 +81,8 @@
                 const isChecked = this.checked;
                 $dailyQuestGroup.toggle(isChecked);
                 $dailyThanksGroup.toggle(isChecked);
-                $simulationGroup.toggle(!isChecked); // Hide simulation group if checked
+                $simulationGroup.toggle(!isChecked); 
+
             });
         });
     </script>
