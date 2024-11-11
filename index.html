@@ -61,9 +61,9 @@
         <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
     
-    <div class="checkbox-group" id="ownEachCardGroup" style="display: none;">
-        <label for="ownEachCardCheckbox">Draw each card x2:</label>
-        <input type="checkbox" id="ownEachCardCheckbox" />
+    <div class="checkbox-group" id="drawEachCardTwiceGroup" style="display: none;">
+        <label for="drawEachCardTwiceCheckbox">Draw each card x2:</label>
+        <input type="checkbox" id="drawEachCardTwiceCheckbox" />
     </div>
 
     <div class="checkbox-group" id="excludeRarityGroup">
@@ -83,7 +83,7 @@
             const $simulationGroup = $('#simulationGroup');
             const $dailyQuestGroup = $('#dailyQuestGroup');
             const $dailyThanksGroup = $('#dailyThanksGroup');
-            const $ownEachCardGroup = $('#ownEachCardGroup');
+            const $ownEachCardGroup = $('#drawEachCardTwiceGroup');
 
             $drawUntilAllCardsOwned.change(function () {
                 const isChecked = this.checked;
@@ -163,6 +163,7 @@
                 drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, targetPack, rate);
                     drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
+                    this.drawCounts[card.id] = (this.drawCounts[card.id] || 0) + 1;
                 });
 
                 return drawnCards;
@@ -186,7 +187,8 @@
                     const drawnCards = this.openPack(targetPack, language);
                     Object.keys(drawnCards).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (this.isCardOwned(card)) ownedCards.add(cardId);
+                        if (this.isCardOwned(card)) 
+                            ownedCards.add(cardId);
                     });
                     packsOpenedHistory.push(drawnCards);
                     currentCount++;
@@ -242,9 +244,13 @@
             }
 
             isCardOwned(card) {
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                const excludeStarCards = $('#excludeStarCards').is(':checked');
-                return (!excludeCrownCards || card.rarity !== '♛') && (!excludeStarCards || !card.rarity.startsWith('☆'));
+                const excludeCrown = $('#excludeCrownCards').is(':checked') && card.rarity === '♛';
+                const excludeStar = $('#excludeStarCards').is(':checked') && card.rarity.startsWith('☆');
+                return !(excludeCrown || excludeStar) && (!$('#drawEachCardTwiceCheckbox').is(':checked') || this.getDrawCount(card.id) >= 2);
+            }
+
+            getDrawCount(cardId) {
+                return this.drawCounts[cardId] || 0;
             }
 
             aggregateDrawnCards(packsOpenedHistory) {
@@ -278,6 +284,10 @@
 
             getTotalCardsInPack(targetPack) {
                 return this.getFilteredCards(targetPack).length;
+            }
+
+            constructor() {
+                this.drawCounts = {};
             }
         }
         $(document).ready(function () {
