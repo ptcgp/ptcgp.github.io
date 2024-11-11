@@ -52,22 +52,24 @@
     <div class="checkbox-group" id="dailyQuestGroup" style="display: none;">
         <label for="completeDailyQuest">Complete Daily Quest:</label>
         <input type="checkbox" id="completeDailyQuest" />
+        <span class="info-icon-tooltip" data-tooltip="dailyQuest" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="dailyThanksGroup" style="display: none;">
         <label for="completeDailyThanks">Complete Daily Thanks:</label>
         <input type="checkbox" id="completeDailyThanks" />
+        <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
-
 
     <div class="checkbox-group" id="excludeRarityGroup">
         <label for="excludeCrownCards">Exclude Crown ♛ Cards:</label>
         <input type="checkbox" id="excludeCrownCards" />
-
+        <span class="info-icon-tooltip" data-tooltip="excludeCrown" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
         <br>
 
         <label for="excludeStarCards">Exclude Star ☆ Cards:</label>
         <input type="checkbox" id="excludeStarCards" />
+        <span class="info-icon-tooltip" data-tooltip="excludeStar" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
 
     <script>
@@ -119,6 +121,23 @@
             <!-- Card data will be appended here -->
         </tbody>
     </table>
+
+    <script>
+        $(document).ready(function () {
+            // Function to handle tooltip popups
+            function setupTooltip(selector, message) {
+                $(selector).on('click', function () {
+                    alert(message);
+                });
+            }
+
+            // Set up tooltips
+            setupTooltip('.info-icon-tooltip[data-tooltip="dailyQuest"]', 'Free Hourglass x4 after completing the daily quest.');
+            setupTooltip('.info-icon-tooltip[data-tooltip="dailyThanks"]', 'Free Shop ticket x5 after receiving the Thanks or Likes for 5 times. (Which is 1.67 Hourglass / days in total)');
+            setupTooltip('.info-icon-tooltip[data-tooltip="excludeCrown"]', 'Exclude Crown ♛ Cards when counting the number of cards owned. You can still draw them.');
+            setupTooltip('.info-icon-tooltip[data-tooltip="excludeStar"]', 'Exclude Star ☆ Cards when counting the number of cards owned. You can still draw them.');
+        });
+    </script>
 
     <script type="module">
         import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST } from './data.js';
