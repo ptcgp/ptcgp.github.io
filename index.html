@@ -63,30 +63,35 @@
     <div class="checkbox-group" id="dailyQuestGroup" style="display: none;">
         <label for="completeDailyQuest">Complete Daily Quest:</label>
         <input type="checkbox" id="completeDailyQuest" />
-        <span class="info-icon-tooltip" data-tooltip="dailyQuest" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="dailyQuest" style="cursor: pointer; margin-left: 5px;"
+            title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="dailyThanksGroup" style="display: none;">
         <label for="completeDailyThanks">Complete Daily Thanks:</label>
         <input type="checkbox" id="completeDailyThanks" />
-        <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="dailyThanks" style="cursor: pointer; margin-left: 5px;"
+            title="Click for more info">ℹ️</span>
     </div>
-    
+
     <div class="checkbox-group" id="drawEachCardTwiceGroup" style="display: none;">
         <label for="drawEachCardTwiceCheckbox">Draw each card x2:</label>
         <input type="checkbox" id="drawEachCardTwiceCheckbox" />
-        <span class="info-icon-tooltip" data-tooltip="drawEachCardTwice" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="drawEachCardTwice" style="cursor: pointer; margin-left: 5px;"
+            title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="excludeRarityGroup">
         <label for="excludeCrownCards">Exclude Crown ♛ Cards:</label>
         <input type="checkbox" id="excludeCrownCards" />
-        <span class="info-icon-tooltip" data-tooltip="excludeCrown" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="excludeCrown" style="cursor: pointer; margin-left: 5px;"
+            title="Click for more info">ℹ️</span>
         <br>
 
         <label for="excludeStarCards">Exclude Star ☆ Cards:</label>
         <input type="checkbox" id="excludeStarCards" />
-        <span class="info-icon-tooltip" data-tooltip="excludeStar" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
+        <span class="info-icon-tooltip" data-tooltip="excludeStar" style="cursor: pointer; margin-left: 5px;"
+            title="Click for more info">ℹ️</span>
     </div>
 
     <script>
@@ -98,19 +103,19 @@
             const $dailyThanksGroup = $('#dailyThanksGroup');
             const $ownEachCardGroup = $('#drawEachCardTwiceGroup');
             const $completenessSliderGroup = $('#completenessSliderGroup');
-            
+
 
             $drawUntilAllCardsOwned.change(function () {
                 const isChecked = this.checked;
                 $completeAllPacksGroup.toggle(isChecked);
-                $completenessSliderGroup.toggle(isChecked); 
+                $completenessSliderGroup.toggle(isChecked);
                 $dailyQuestGroup.toggle(isChecked);
                 $dailyThanksGroup.toggle(isChecked);
-                $ownEachCardGroup.toggle(isChecked); 
-                $simulationGroup.toggle(!isChecked); 
+                $ownEachCardGroup.toggle(isChecked);
+                $simulationGroup.toggle(!isChecked);
             });
 
-            $('#completenessSlider').on('input', function() {
+            $('#completenessSlider').on('input', function () {
                 $('#completenessValue').text(this.value + '%');
             });
         });
@@ -212,7 +217,7 @@
                     const drawnCards = this.openPack(targetPack, language);
                     Object.keys(drawnCards).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (this.isCardOwned(card)) 
+                        if (this.isCardOwned(card))
                             ownedCards.add(cardId);
                     });
                     packsOpenedHistory.push(drawnCards);
@@ -235,10 +240,10 @@
 
             updateOpenedCount(currentCount, targetPack) {
                 const adjustedPacksPerDay = (24 // base
-                + (1/3) // daily shop free ticket
-                + ($('#completeDailyQuest').is(':checked') ? 4 : 0)  // daily quest
-                + ($('#completeDailyThanks').is(':checked') ? (5/6) : 0))   // daily thanks ticket
-                / 12;
+                    + (1 / 3) // daily shop free ticket
+                    + ($('#completeDailyQuest').is(':checked') ? 4 : 0)  // daily quest
+                    + ($('#completeDailyThanks').is(':checked') ? (5 / 6) : 0))   // daily thanks ticket
+                    / 12;
                 $('#opened').text(`Opened: ${currentCount} (Total Days: ${Math.ceil(currentCount / adjustedPacksPerDay)})`);
             }
 
