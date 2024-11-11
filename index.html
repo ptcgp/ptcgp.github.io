@@ -147,6 +147,7 @@
                 <th style="text-align: left; width: 25%;">Name</th>
                 <th style="text-align: left; width: 25%;">Rarity</th>
                 <th style="text-align: left; width: 25%;">Count</th>
+                <th style="text-align: left; width: 25%;">Pack</th>
             </tr>
         </thead>
         <tbody>
@@ -183,6 +184,7 @@
             static CARD_LIST = CARD_LIST;
 
             openPack(targetPack, language) {
+                //console.log(`Opening pack: ${targetPack}, Language: ${language}`);
                 const drawnCards = {};
                 const filteredCards = TCGPSimulator.CARD_LIST.filter(card => card.pack === targetPack || card.pack === 'All');
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
@@ -197,6 +199,7 @@
             }
 
             runSimulator(numberSimulations = 100, targetPack = 'Charizard', language = 'en') {
+                console.log(`Running simulator with ${numberSimulations} simulations for pack: ${targetPack}, Language: ${language}`);
                 const packsOpenedHistory = [];
                 $('#opened').text('');
                 const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
@@ -205,16 +208,21 @@
                 this.updateOutputTable(packsOpenedHistory, targetPack, language);
             }
 
-            simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language) {
-                const ownedCards = new Set();
+
+            simulateUntilAllCardsOwned(packsOpenedHistory, targetPack, language, completedPacks = [], allOwnedCards = new Set()) {
+                console.log(`Simulating until all cards owned for pack: ${targetPack}, Language: ${language}`);
                 let currentCount = 0;
                 const completenessPercentage = $('#completenessSlider').val(); // Get the selected completeness percentage
 
                 const filteredCards = this.getFilteredCards(targetPack);
-                const totalCards = filteredCards.length;
 
+                var nextPack = ""
+
+                let ownedCards = new Set();
+                
                 while (ownedCards.size < filteredCards.length) {
                     const drawnCards = this.openPack(targetPack, language);
+                    //console.log(`Drawn cards: ${JSON.stringify(drawnCards)}`);
                     Object.keys(drawnCards).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
                         if (this.isCardOwned(card))
@@ -225,10 +233,30 @@
                     this.updateOpenedCount(currentCount, targetPack);
 
                     // Check if the owned card percentage exceeds the selected percentage
-                    const ownedPercentage = (ownedCards.size / totalCards) * 100;
-                    if (ownedPercentage > completenessPercentage) {
-                        break; // Stop if the owned percentage exceeds the selected percentage
+                    const ownedPercentage = (ownedCards.size / filteredCards.length) * 100;
+                    if (ownedPercentage >= completenessPercentage) {
+                        console.log(`Owned ${ownedCards.size} cards of ${filteredCards.length} cards.`);
+
+                        if ($('#completeAllPacks').is(':checked')) {
+                            completedPacks.push(targetPack); // Record the completed pack
+
+                            const availablePacks = $('#targetPack option').map(function () {
+                                return $(this).val();
+                            }).get().filter(pack => !completedPacks.includes(pack));
+
+                            if (availablePacks.length > 0) {
+                                const firstPack = availablePacks[0];
+                                nextPack = firstPack;
+                            } else {
+                                break;
+                            }
+                        }
                     }
+                }
+
+                if (nextPack !== "") {
+                    allOwnedCards = new Set([...allOwnedCards, ...ownedCards]);
+                    this.simulateUntilAllCardsOwned(packsOpenedHistory, nextPack, language, completedPacks, allOwnedCards);
                 }
             }
 
@@ -239,6 +267,7 @@
             }
 
             updateOpenedCount(currentCount, targetPack) {
+                console.log(`Current count of opened packs: ${currentCount}, Target pack: ${targetPack}`);
                 const adjustedPacksPerDay = (24 // base
                     + (1 / 3) // daily shop free ticket
                     + ($('#completeDailyQuest').is(':checked') ? 4 : 0)  // daily quest
@@ -248,10 +277,11 @@
             }
 
             updateOutputTable(packsOpenedHistory, targetPack, language) {
+                console.log(`Updating output table for pack: ${targetPack}, Language: ${language}`);
                 const finalDrawnCards = this.aggregateDrawnCards(packsOpenedHistory);
                 const sortedCards = this.sortCards(finalDrawnCards);
                 sortedCards.forEach(({ card, count }) => {
-                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td></tr>`);
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
                 });
                 $('#owned').text(`Owned: ${this.getOwnedCount(finalDrawnCards)}/${this.getTotalCardsInPack(targetPack)}`);
                 $('#output').append(`</table><br>`);
@@ -269,11 +299,11 @@
                 }
             }
 
-            getFilteredCards(targetPack) {
+            getFilteredCards(targetPack, includeAll = true) {
                 const excludeCrownCards = $('#excludeCrownCards').is(':checked');
                 const excludeStarCards = $('#excludeStarCards').is(':checked');
                 return TCGPSimulator.CARD_LIST.filter(card =>
-                    (card.pack === targetPack || card.pack === 'All') &&
+                    (card.pack === targetPack || (includeAll && card.pack === 'All')) &&
                     (!excludeCrownCards || card.rarity !== '♛') &&
                     (!excludeStarCards || !card.rarity.startsWith('☆'))
                 );
@@ -323,7 +353,8 @@
             }
 
             getTotalCardsInPack(targetPack) {
-                return this.getFilteredCards(targetPack).length;
+                const isCompleteAllPacks = $('#completeAllPacks').is(':checked');
+                return isCompleteAllPacks ? TCGPSimulator.CARD_LIST.filter(card => card.pack !== 'Unlocked').length : this.getFilteredCards(targetPack).length;
             }
 
             constructor() {
