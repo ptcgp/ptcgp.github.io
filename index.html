@@ -75,6 +75,7 @@
     <div class="checkbox-group" id="drawEachCardTwiceGroup" style="display: none;">
         <label for="drawEachCardTwiceCheckbox">Draw each card x2:</label>
         <input type="checkbox" id="drawEachCardTwiceCheckbox" />
+        <span class="info-icon-tooltip" data-tooltip="drawEachCardTwice" style="cursor: pointer; margin-left: 5px;" title="Click for more info">ℹ️</span>
     </div>
 
     <div class="checkbox-group" id="excludeRarityGroup">
@@ -162,6 +163,8 @@
             setupTooltip('.info-icon-tooltip[data-tooltip="dailyThanks"]', 'Free Shop ticket x5 after receiving the Thanks or Likes for 5 times. (Which is 1.67 Hourglass / days in total)');
             setupTooltip('.info-icon-tooltip[data-tooltip="excludeCrown"]', 'Exclude Crown ♛ Cards when counting the number of cards owned. You can still draw them.');
             setupTooltip('.info-icon-tooltip[data-tooltip="excludeStar"]', 'Exclude Star ☆ Cards when counting the number of cards owned. You can still draw them.');
+            setupTooltip('.info-icon-tooltip[data-tooltip="drawEachCardTwice"]', 'Will only count as owned if the card is drawn twice.');
+
         });
     </script>
 
@@ -274,7 +277,11 @@
             isCardOwned(card) {
                 const excludeCrown = $('#excludeCrownCards').is(':checked') && card.rarity === '♛';
                 const excludeStar = $('#excludeStarCards').is(':checked') && card.rarity.startsWith('☆');
-                return !(excludeCrown || excludeStar) && (!$('#drawEachCardTwiceCheckbox').is(':checked') || this.getDrawCount(card.id) >= 2);
+                const drawCount = this.getDrawCount(card.id);
+                const drawEachCardTwiceChecked = $('#drawEachCardTwiceCheckbox').is(':checked');
+
+                if (excludeCrown || excludeStar) return false;
+                return drawEachCardTwiceChecked ? drawCount >= 2 : true;
             }
 
             getDrawCount(cardId) {
