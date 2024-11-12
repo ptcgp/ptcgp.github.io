@@ -201,7 +201,6 @@
                     await Promise.all(promises);
 
                     if (numberOfSimulations > 1) {
-                        console.log('show days chart');
                         $('#output').hide();
                         $('#daysChart').show(); // Show the day graph
                         this.updateChart();
@@ -220,7 +219,7 @@
 
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
-                const completenessPercentage = $('#completenessSlider').val();
+                const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
                 const filteredCards = this.getFilteredCards(targetPack);
                 const ownedCards = new Set()
 
@@ -243,9 +242,11 @@
 
                             if (availablePacks.length > 0) {
                                 const nextPack = availablePacks[0];
-                                this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks, ownedCards);
+                                this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
                             }
                         }
+
+                        break;
                     }
                 }
             }
@@ -365,7 +366,7 @@
                 const chartData = {
                     labels: labels, // Use simulation labels
                     datasets: [{
-                        label: 'Count of Simulations',
+                        label: 'Count of Packs',
                         data: counts, // Use counts for each simulation
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
