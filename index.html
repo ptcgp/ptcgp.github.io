@@ -146,6 +146,8 @@
     <script type="module">
         import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST } from './data.js';
 
+        let chart = null;
+
         class TCGPSimulator {
             static RARITIES = RARITIES;
             static PACK_RATES = PACK_RATES;
@@ -154,7 +156,6 @@
 
             constructor() {
                 this.totalDaysData = []; // Initialize the array to store total days
-                this.chart = null; // Initialize chart variable
             }
 
             openPack(drawCounts, targetPack, language) {
@@ -369,12 +370,12 @@
                 };
 
                 // Destroy the existing chart if it exists
-                if (this.chart) {
-                    this.chart.destroy(); // Destroy the previous chart instance
+                if (chart) {
+                    chart.destroy(); // Destroy the previous chart instance
                 }
 
                 // Create a new chart
-                this.chart = new Chart(ctx, {
+                chart = new Chart(ctx, {
                     type: 'bar', // Change to 'line' for a line chart
                     data: chartData,
                     options: {
