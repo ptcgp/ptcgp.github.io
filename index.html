@@ -25,6 +25,11 @@
         <input type="checkbox" id="drawUntilAllCardsOwned" />
     </div>
 
+    <div class="checkbox-group" id="simulationGroup">
+        <label for="numberSimulations">Simulations Count:</label>
+        <input type="number" id="numberSimulations" value="100" min="1" max="99999" />
+    </div>
+
     <div class="checkbox-group" id="completeAllPacksGroup" style="display: none;">
         <label for="completeAllPacks">Complete All Packs:</label>
         <input type="checkbox" id="completeAllPacks" />
@@ -36,18 +41,13 @@
         <span id="completenessValue">100%</span>
     </div>
 
-    <div class="checkbox-group" id="simulationGroup">
-        <label for="numberSimulations">Simulations Count:</label>
-        <input type="number" id="numberSimulations" value="10000" min="1" max="10000" />
-    </div>
-
-    <div class="checkbox-group" id="dailyQuestGroup" style="display: none;">
+    <div class="checkbox-group" id="dailyQuestGroup">
         <label for="completeDailyQuest">Complete Daily Quest:</label>
         <input type="checkbox" id="completeDailyQuest" />
         <span class="info-icon-tooltip" data-tooltip="dailyQuest" title="Click for more info">ℹ️</span>
     </div>
 
-    <div class="checkbox-group" id="dailyThanksGroup" style="display: none;">
+    <div class="checkbox-group" id="dailyThanksGroup" >
         <label for="completeDailyThanks">Complete Daily Thanks:</label>
         <input type="checkbox" id="completeDailyThanks" />
         <span class="info-icon-tooltip" data-tooltip="dailyThanks" title="Click for more info">ℹ️</span>
@@ -74,9 +74,6 @@
         $(document).ready(function () {
             const $drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned');
             const $completeAllPacksGroup = $('#completeAllPacksGroup');
-            const $simulationGroup = $('#simulationGroup');
-            const $dailyQuestGroup = $('#dailyQuestGroup');
-            const $dailyThanksGroup = $('#dailyThanksGroup');
             const $ownEachCardGroup = $('#drawEachCardTwiceGroup');
             const $completenessSliderGroup = $('#completenessSliderGroup');
 
@@ -85,10 +82,7 @@
                 const isChecked = this.checked;
                 $completeAllPacksGroup.toggle(isChecked);
                 $completenessSliderGroup.toggle(isChecked);
-                $dailyQuestGroup.toggle(isChecked);
-                $dailyThanksGroup.toggle(isChecked);
                 $ownEachCardGroup.toggle(isChecked);
-                $simulationGroup.toggle(!isChecked);
             });
 
             $('#completenessSlider').on('input', function () {
@@ -182,7 +176,7 @@
                 const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
 
                 if (drawUntilAllCardsOwned) {
-                    const numberOfSimulations = 1000;
+                    const numberOfSimulations = $('#numberSimulations').val();
 
                     const promises = Array.from({ length: numberOfSimulations }, () =>  {
                         const drawCounts = {};
