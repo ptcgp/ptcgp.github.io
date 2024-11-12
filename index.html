@@ -184,27 +184,31 @@
                 if (drawUntilAllCardsOwned) {
                     const numberOfSimulations = 1000;
 
-                    if (numberSimulations > 1) {
-                        $('#output').hide(); // Hide the output table if more than 1 simulation
-                    }
-
                     const promises = Array.from({ length: numberOfSimulations }, () =>  {
                         const drawCounts = {};
                         const packsOpenedHistory = [];
-                        const completedPacks = [];
-                        const allOwnedCards = new Set()
-                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language);
+                        const completedPacks = []
+                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
 
                         const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
                         this.saveTotalDays(totalDays);
 
                         if (numberOfSimulations <= 1) {
                             this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
-                            //this.updateOpenedCount(packsOpenedHistory, targetPack);
+                            this.updateOpenedCount(packsOpenedHistory, targetPack);
                         }
                     });
                     await Promise.all(promises);
-                  
+
+                    if (numberOfSimulations > 1) {
+                        console.log('show days chart');
+                        $('#output').hide();
+                        $('#daysChart').show(); // Show the day graph
+                        this.updateChart();
+                    } else {
+                        $('#output').show();
+                        $('#daysChart').hide(); // Hide the day graph
+                    }
                 } else {
                     const drawCounts = {};
                     const packsOpenedHistory = [];
@@ -214,14 +218,13 @@
                 }
             }
 
-            simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks, allOwnedCards) {
+            simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
                 const completenessPercentage = $('#completenessSlider').val();
                 const filteredCards = this.getFilteredCards(targetPack);
-                let ownedCards = new Set();
+                const ownedCards = new Set()
 
                 while (ownedCards.size < filteredCards.length) {
-
                     const drawnCards = this.openPack(drawCounts, targetPack, language);
                     Object.keys(drawnCards).forEach(cardId => {
                         if (this.isCardOwned(drawCounts, cardId)) 
@@ -240,7 +243,7 @@
 
                             if (availablePacks.length > 0) {
                                 const nextPack = availablePacks[0];
-                                this.simulateUntilAllCardsOwned(packsOpenedHistory, nextPack, language, completedPacks, ownedCards);
+                                this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks, ownedCards);
                             }
                         }
                     }
@@ -350,36 +353,20 @@
 
             saveTotalDays(totalDays) {
                 this.totalDaysData.push(totalDays); // Store total days
-                this.updateChart(); // Update the chart with new data
-            }
-
-            groupDataIntoRanges(data, rangeSize) {
-                const groupedData = {};
-                data.forEach(day => {
-                    const range = Math.floor(day / rangeSize) * rangeSize; // Determine the range
-                    if (!groupedData[range]) {
-                        groupedData[range] = 0; // Initialize count for this range
-                    }
-                    groupedData[range]++; // Increment count for this range
-                });
-                return groupedData;
             }
 
             updateChart() {
-                const maxDays = Math.max(...this.totalDaysData); 
-                const rangeSize = Math.ceil(maxDays / 50); 
-                const groupedData = this.groupDataIntoRanges(this.totalDaysData, rangeSize);
+                const counts = this.totalDaysData.sort((a, b) => a - b); // Sort the totalDaysData
 
                 // Prepare data for the chart
-                const labels = Object.keys(groupedData).map(range => `${range} - ${+range + rangeSize - 1}`); // Create range labels
-                const counts = Object.values(groupedData); // Get counts for each range
+                const labels = counts.map((_, index) => `${(index / counts.length * 100).toFixed(0)}%`); // Create labels showing percentage from 0% to 100%
 
                 const ctx = document.getElementById('daysChart').getContext('2d');
                 const chartData = {
-                    labels: labels, // Use range labels
+                    labels: labels, // Use simulation labels
                     datasets: [{
                         label: 'Count of Simulations',
-                        data: counts, // Use counts for each range
+                        data: counts, // Use counts for each simulation
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
