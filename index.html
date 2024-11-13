@@ -55,11 +55,11 @@
         </div>
 
         <div class="row mb-3" id="targetPackGroup">
-            <div class="col-2 form-check">                
+            <div class="col form-check">                
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="targetPack">Choose a pack to open:</label>
             </div>
-            <div class="col-3">
+            <div class="col">
                 <select class="form-select" id="targetPack">
                     <option value="Mewtwo">Mewtwo</option>
                     <option value="Charizard">Charizard</option>
@@ -69,38 +69,38 @@
         </div>
 
         <div class="row mb-3" id="specificCardGroup" style="display: none;">
-            <div class="form-check col-2">
+            <div class="col form-check">
                 <input type="checkbox" class="form-check-input" id="drawSpecificCard">
                 <label class="form-check-label" for="drawSpecificCard">
                     Draw Specific Card
                 </label>
                 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Complete daily quest info"></i>
             </div>
-            <div class="col-3">
+            <div class="col">
                 <select class="form-select" id="targetCard">
                 </select>
             </div>
         </div>
 
         <div class="row mb-3" id="simulationGroup">
-            <div class="form-check col-2">
+            <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="numberSimulations">Simulations Count:</label>
             </div>
-            <div class="col-3">
+            <div class="col">
                 <input type="number" class="form-control" id="numberSimulations" value="100" min="1" max="99999">
             </div>
         </div>
 
         <div class="row mb-3" id="completenessSliderGroup" style="display: none;">
-            <div class="form-check col-2">
+            <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="completenessSlider">Select Completeness:</label>
             </div>
-            <div class="col-3">
+            <div class="col">
                 <input type="range" class="form-range" id="completenessSlider" min="0" max="100" value="100">
             </div>
-            <div class="col">
+            <div class="col-1">
                 <span id="completenessValue">100%</span>
             </div>
         </div>
@@ -156,10 +156,10 @@
         </div>
 
         <div class="row mb-3" style="display: none;">
-            <div class="col-2">
+            <div class="col">
                 <label class="form-label" for="languageSelect">Choose Language:</label>
             </div>
-            <div class="col-3">
+            <div class="col">
                 <select class="form-select" id="languageSelect">
                     <option value="en">English</option>
                     <option value="zhhk">正體中文 (香港) - 未完成</option>
