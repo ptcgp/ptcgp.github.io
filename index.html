@@ -205,8 +205,11 @@
                 $('#completenessSliderGroup').toggle(this.checked);
                 $('#specificCardGroup').toggle(this.checked);
                 $('#targetPack').prop('disabled', false);
-                $('#completeAllPacks').prop('disabled', false);
+                $('#targetCard').prop('checked', false).prop('disabled', false);
+                $('#drawSpecificCard').prop('checked', false).prop('disabled', false);
                 $('#completeAllPacks').prop('checked', false);
+                $('#excludeCrownCards').prop('disabled', false);
+                $('#excludeStarCards').prop('disabled', false);
             });
 
             $('#completenessSlider').on('input', function () {
