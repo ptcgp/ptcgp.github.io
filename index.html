@@ -198,9 +198,8 @@
     <script>
         $(document).ready(function () {
             // Initialize Bootstrap tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
+            [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
             $('#drawUntilAllCardsOwned').change(function () {
@@ -258,20 +257,8 @@
                 this.totalDaysData = []; // Initialize the array to store total days
             }
 
-            openPack(drawCounts, filteredCards, language) {
-                const drawnCards = {};
-                const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
-
-                drawRates.forEach(rate => {
-                    const card = this.randomChoice(filteredCards, rate);
-                    drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
-                    drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
-                });
-
-                return drawnCards;
-            }
-
             async runSimulator(numberSimulations = 500, targetPack = 'Charizard', language = 'en') {
+                console.log('--------------------------------');
                 console.log('Draw Until All Cards Owned:          ', $('#drawUntilAllCardsOwned').is(':checked'));
                 console.log('Complete All Packs:                  ', $('#completeAllPacks').is(':checked'));
                 console.log('Number of Simulations:               ', $('#numberSimulations').val());
@@ -328,7 +315,7 @@
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
-                const filteredCards = this.getFilteredCards(targetPack);
+                const filteredCards = this.getFilteredCards(targetPack, true, true);
                 const ownedCards = new Set()
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
@@ -355,6 +342,27 @@
                 }
             }
 
+            simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
+                const filteredCards = this.getFilteredCards(targetPack, true, true);
+                for (let i = 0; i < numberSimulations; i++) {
+                    packsOpenedHistory.push(this.openPack(drawCounts, filteredCards, language));
+                }
+            }
+
+            openPack(drawCounts, filteredCards, language) {
+                const drawnCards = {};
+                const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
+
+                drawRates.forEach(rate => {
+                    const card = this.randomChoice(filteredCards, rate);
+                        drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
+                        drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
+                    
+                });
+
+                return drawnCards;
+            }
+
             handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
@@ -366,13 +374,6 @@
                         const nextPack = availablePacks[0];
                         this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
                     }
-                }
-            }
-
-            simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
-                const filteredCards = this.getFilteredCards(targetPack);
-                for (let i = 0; i < numberSimulations; i++) {
-                    packsOpenedHistory.push(this.openPack(drawCounts, filteredCards, language));
                 }
             }
 
@@ -408,9 +409,9 @@
                 }
             }
 
-            getFilteredCards(targetPack, includeAll = true) {
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                const excludeStarCards = $('#excludeStarCards').is(':checked');
+            getFilteredCards(targetPack, includeAll = true, allRarity = false) {
+                const excludeCrownCards = $('#excludeCrownCards').is(':checked') && !allRarity;
+                const excludeStarCards = $('#excludeStarCards').is(':checked') && !allRarity;
                 return TCGPSimulator.CARD_LIST.filter(card =>
                     (card.pack === targetPack || (includeAll && card.pack === 'All')) &&
                     (!excludeCrownCards || card.rarity !== '♛') &&
