@@ -408,7 +408,7 @@
                 sortedCards.forEach(({ card, count }) => {
                     $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
                 });
-                const totalCardsInPack = this.getFilteredCards(targetPack, true, false).length;
+                const totalCardsInPack = this.getFilteredCards(targetPack, false).length;
                 $('#owned').text(`Owned: ${this.getOwnedCount(drawCounts, finalDrawnCards)}/${totalCardsInPack}`);
             }
 
