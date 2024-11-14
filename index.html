@@ -315,7 +315,8 @@
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
-                const filteredCards = this.getFilteredCards(targetPack, true, true);
+                const filteredCards = this.getFilteredCards(targetPack, true, false);
+                console.log(`Filtered cards: ${filteredCards.length}`);
                 const ownedCards = new Set()
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
@@ -355,15 +356,17 @@
 
                 drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, rate);
+                    if (card) {
                         drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
                         drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
-                    
+                    }
                 });
 
                 return drawnCards;
             }
 
             handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
+                console.log(`Pack completed: ${targetPack}`);
                 if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
                     const availablePacks = $('#targetPack option').map(function () {
@@ -371,7 +374,9 @@
                     }).get().filter(pack => !completedPacks.includes(pack));
 
                     if (availablePacks.length > 0) {
+                        console.log(`Available packs: ${availablePacks}`);
                         const nextPack = availablePacks[0];
+                        console.log(`Next pack: ${nextPack}`);
                         this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
                     }
                 }
