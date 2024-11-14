@@ -302,7 +302,7 @@
                     this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
 
                     const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
-                    this.saveTotalDays(totalDays);
+                    this.totalDaysData.push(totalDays); 
 
                     if (numberOfSimulations == 1) {
                         this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
@@ -408,7 +408,8 @@
                 sortedCards.forEach(({ card, count }) => {
                     $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
                 });
-                $('#owned').text(`Owned: ${this.getOwnedCount(drawCounts, finalDrawnCards)}/${this.getTotalCardsInPack(targetPack)}`);
+                const totalCardsInPack = this.getFilteredCards(targetPack, true, false).length;
+                $('#owned').text(`Owned: ${this.getOwnedCount(drawCounts, finalDrawnCards)}/${totalCardsInPack}`);
             }
 
             randomChoice(array, weights) {
@@ -470,24 +471,6 @@
                 return Object.keys(finalDrawnCards).filter(cardId => {
                     return this.isCardOwned(drawCounts, cardId);
                 }).length;
-            }
-
-            getTotalCardsInPack(targetPack) {
-                const isCompleteAllPacks = $('#completeAllPacks').is(':checked');
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked');
-                const excludeStarCards = $('#excludeStarCards').is(':checked');
-
-                return isCompleteAllPacks
-                    ? TCGPSimulator.CARD_LIST.filter(card =>
-                        card.pack !== 'Unlocked' &&
-                        (!excludeCrownCards || card.rarity !== '♛') &&
-                        (!excludeStarCards || !card.rarity.startsWith('☆'))
-                    ).length
-                    : this.getFilteredCards(targetPack).length;
-            }
-
-            saveTotalDays(totalDays) {
-                this.totalDaysData.push(totalDays); // Store total days
             }
 
             updateChart() {
