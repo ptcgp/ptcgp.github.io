@@ -188,9 +188,9 @@
             </tbody>
         </table>
         
-        <div class="progress mb-3">
+        <!-- <div class="progress mb-3">
             <div class="progress-bar" role="progressbar" style="width: 0%;" id="simulationProgress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-        </div>
+        </div> -->
 
         <div class="mb-3">
             <canvas id="daysChart" width="400" height="200"></canvas>
@@ -237,6 +237,8 @@
                     $('#drawSpecificCard').prop('checked', false).prop('disabled', true);
                     $('#targetPack').prop('disabled', true);
                     $('#targetCard').prop('disabled', true);
+                    $('#excludeCrownCards').prop('checked', false).prop('disabled', false);
+                    $('#excludeStarCards').prop('checked', false).prop('disabled', false);
                 } else {
                     $('#drawSpecificCard').prop('disabled', false);
                     $('#targetCard').prop('disabled', false);
