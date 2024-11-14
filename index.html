@@ -316,7 +316,6 @@
                 let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
                 const filteredCards = this.getFilteredCards(targetPack, true, false);
-                console.log(`Filtered cards: ${filteredCards.length}`);
                 const ownedCards = new Set()
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
