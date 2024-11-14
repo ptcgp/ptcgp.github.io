@@ -324,12 +324,13 @@
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
-                const filteredCards = this.getFilteredCards(targetPack, true, false);
+                const targetCards = this.getFilteredCards(targetPack, true, false);
+                const filteredCards = this.getFilteredCards(targetPack, true, true);
                 const ownedCards = new Set()
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
 
-                while (ownedCards.size < filteredCards.length) {
+                while (ownedCards.size < targetCards.length) {
                     const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
                     Object.keys(cardsInDrawnPack).forEach(cardId => {
                         if (this.isCardOwned(drawCounts, cardId)) {
@@ -343,7 +344,7 @@
                         break;
                     }
 
-                    const ownedPercentage = (ownedCards.size / filteredCards.length) * 100;
+                    const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
                     if (ownedPercentage >= completenessPercentage) {
                         this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
                         break;
@@ -422,9 +423,9 @@
                 }
             }
 
-            getFilteredCards(targetPack, includeAll = true, allRarity = false) {
-                const excludeCrownCards = $('#excludeCrownCards').is(':checked') && !allRarity;
-                const excludeStarCards = $('#excludeStarCards').is(':checked') && !allRarity;
+            getFilteredCards(targetPack, includeAll = true, overrideRarity = false) {
+                const excludeCrownCards = overrideRarity ? false : $('#excludeCrownCards').is(':checked');
+                const excludeStarCards = overrideRarity ? false : $('#excludeStarCards').is(':checked');
                 return TCGPSimulator.CARD_LIST.filter(card =>
                     (card.pack === targetPack || (includeAll && card.pack === 'All')) &&
                     (!excludeCrownCards || card.rarity !== '♛') &&
