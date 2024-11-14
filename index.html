@@ -207,15 +207,11 @@
             });
 
             $('#drawUntilAllCardsOwned').change(function () {
-                $('#completeAllPacksGroup').toggle(this.checked);
-                $('#completenessSliderGroup').toggle(this.checked);
-                $('#specificCardGroup').toggle(this.checked);
+                const isChecked = this.checked;
+                $('#completeAllPacksGroup, #completenessSliderGroup, #specificCardGroup').toggle(isChecked);
                 $('#targetPack').prop('disabled', false);
-                $('#targetCard').prop('checked', false).prop('disabled', false);
-                $('#drawSpecificCard').prop('checked', false).prop('disabled', false);
-                $('#completeAllPacks').prop('checked', false);
-                $('#excludeCrownCards').prop('disabled', false);
-                $('#excludeStarCards').prop('disabled', false);
+                $('#targetCard, #drawSpecificCard').prop({ checked: false, disabled: false });
+                $('#completeAllPacks, #excludeCrownCards, #excludeStarCards').prop('disabled', false);
             });
 
             $('#completenessSlider').on('input', function () {
@@ -223,27 +219,14 @@
             });
 
             $('#drawSpecificCard').change(function() {
-                if (this.checked) {
-                    $('#excludeCrownCards').prop('checked', false).prop('disabled', true);
-                    $('#excludeStarCards').prop('checked', false).prop('disabled', true);
-                } else {
-                    $('#excludeCrownCards').prop('disabled', false);
-                    $('#excludeStarCards').prop('disabled', false);
-                }
+                $('#excludeCrownCards, #excludeStarCards').prop('checked', false).prop('disabled', this.checked);
             });
 
             $('#completeAllPacks').change(function() {
-                if (this.checked) {
-                    $('#drawSpecificCard').prop('checked', false).prop('disabled', true);
-                    $('#targetPack').prop('disabled', true);
-                    $('#targetCard').prop('disabled', true);
-                    $('#excludeCrownCards').prop('checked', false).prop('disabled', false);
-                    $('#excludeStarCards').prop('checked', false).prop('disabled', false);
-                } else {
-                    $('#drawSpecificCard').prop('disabled', false);
-                    $('#targetCard').prop('disabled', false);
-                    $('#targetPack').prop('disabled', false);
-                }
+                const isChecked = this.checked;
+                $('#drawSpecificCard').prop({ checked: !isChecked, disabled: isChecked });
+                $('#targetPack, #targetCard').prop('disabled', isChecked);
+                $('#excludeCrownCards, #excludeStarCards').prop({ checked: false, disabled: false });
             });
         });
     </script>
