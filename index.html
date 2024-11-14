@@ -353,7 +353,7 @@
             }
 
             simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
-                const filteredCards = this.getFilteredCards(targetPack, false);
+                const filteredCards = this.getFilteredCards(targetPack, true);
                 for (let i = 0; i < numberSimulations; i++) {
                     packsOpenedHistory.push(this.openPack(drawCounts, filteredCards, language));
                 }
