@@ -101,7 +101,7 @@
                 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Stop when completeness is reached"></i>
             </div>
             <div class="col">
-                <input type="range" class="form-range" id="completenessSlider" min="0" max="100" value="100">
+                <input type="range" class="form-range" id="completenessSlider" min="1" max="100" value="100">
             </div>
             <div class="col-1">
                 <span id="completenessValue">100%</span>
@@ -316,6 +316,7 @@
                         $('#daysChart').hide(); // Hide the day graph
                     }
                 } else {
+                    $('#output').show();
                     const drawCounts = {};
                     const packsOpenedHistory = [];
                     this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
