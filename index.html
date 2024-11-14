@@ -51,6 +51,7 @@
                 <label class="form-check-label" for="completeAllPacks">
                     Complete All Packs
                 </label>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Switch to next pack when all cards are owned"></i>
             </div>
         </div>
 
@@ -74,7 +75,7 @@
                 <label class="form-check-label" for="drawSpecificCard">
                     Draw Specific Card
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Complete daily quest info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Stop when specific card is drawn"></i>
             </div>
             <div class="col">
                 <select class="form-select" id="targetCard">
@@ -86,6 +87,7 @@
             <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="numberSimulations">Simulations Count:</label>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="May crash if too high"></i>
             </div>
             <div class="col">
                 <input type="number" class="form-control" id="numberSimulations" value="100" min="1" max="99999">
@@ -96,6 +98,7 @@
             <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="completenessSlider">Completeness:</label>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Stop when completeness is reached"></i>
             </div>
             <div class="col">
                 <input type="range" class="form-range" id="completenessSlider" min="0" max="100" value="100">
@@ -111,7 +114,7 @@
                 <label class="form-check-label" for="completeDailyQuest">
                     Complete Daily Quest
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Complete daily quest info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Free shop tickets every 24 hours"></i>
             </div>
         </div>
 
@@ -121,7 +124,7 @@
                 <label class="form-check-label" for="completeDailyThanks">
                     Complete Daily Thanks
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Complete daily thanks info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Free shop tickets x5 every 24 hours"></i>
             </div>
         </div>
 
@@ -131,7 +134,7 @@
                 <label class="form-check-label" for="drawEachCardTwiceCheckbox">
                     Draw each card x2
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Draw each card twice info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Count as owned when drawn twice"></i>
             </div>
         </div>
 
@@ -141,7 +144,7 @@
                 <label class="form-check-label" for="excludeCrownCards">
                     Exclude Crown ♛ Cards
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude crown cards info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude Crown cards when counting owned"></i>
             </div>
         </div>
 
@@ -151,7 +154,7 @@
                 <label class="form-check-label" for="excludeStarCards">
                     Exclude Star ☆ Cards
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude star cards info"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude star cards when counting owned"></i>
             </div>
         </div>
 
