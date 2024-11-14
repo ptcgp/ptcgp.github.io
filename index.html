@@ -324,8 +324,8 @@
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
                 let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
-                const targetCards = this.getFilteredCards(targetPack, true, false);
-                const filteredCards = this.getFilteredCards(targetPack, true, true);
+                const targetCards = this.getFilteredCards(targetPack, false);
+                const filteredCards = this.getFilteredCards(targetPack, true);
                 const ownedCards = new Set()
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
@@ -353,7 +353,7 @@
             }
 
             simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
-                const filteredCards = this.getFilteredCards(targetPack, true, true);
+                const filteredCards = this.getFilteredCards(targetPack, false);
                 for (let i = 0; i < numberSimulations; i++) {
                     packsOpenedHistory.push(this.openPack(drawCounts, filteredCards, language));
                 }
@@ -424,11 +424,11 @@
                 }
             }
 
-            getFilteredCards(targetPack, includeAll = true, overrideRarity = false) {
+            getFilteredCards(targetPack, overrideRarity = false) {
                 const excludeCrownCards = overrideRarity ? false : $('#excludeCrownCards').is(':checked');
                 const excludeStarCards = overrideRarity ? false : $('#excludeStarCards').is(':checked');
                 return TCGPSimulator.CARD_LIST.filter(card =>
-                    (card.pack === targetPack || (includeAll && card.pack === 'All')) &&
+                    (card.pack === targetPack || card.pack === 'All') &&
                     (!excludeCrownCards || card.rarity !== '♛') &&
                     (!excludeStarCards || !card.rarity.startsWith('☆'))
                 );
