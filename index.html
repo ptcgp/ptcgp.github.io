@@ -321,13 +321,13 @@
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
 
                 while (ownedCards.size < filteredCards.length) {
-                    const drawnCards = this.openPack(drawCounts, filteredCards, language);
-                    Object.keys(drawnCards).forEach(cardId => {
+                    const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
+                    Object.keys(cardsInDrawnPack).forEach(cardId => {
                         if (this.isCardOwned(drawCounts, cardId)) {
                             ownedCards.add(cardId);
                         }
                     });
-                    packsOpenedHistory.push(drawnCards);
+                    packsOpenedHistory.push(cardsInDrawnPack);
                     currentCount++;
 
                     if (drawSpecificCard && ownedCards.has(specificCardId)) {
@@ -350,18 +350,18 @@
             }
 
             openPack(drawCounts, filteredCards, language) {
-                const drawnCards = {};
+                const cardsInDrawnPack = {};
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
 
                 drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, rate);
                     if (card) {
-                        drawnCards[card.id] = (drawnCards[card.id] || 0) + 1;
+                        cardsInDrawnPack[card.id] = (cardsInDrawnPack[card.id] || 0) + 1;
                         drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
                     }
                 });
 
-                return drawnCards;
+                return cardsInDrawnPack;
             }
 
             handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
@@ -435,11 +435,11 @@
             }
 
             aggregateDrawnCards(packsOpenedHistory) {
-                return packsOpenedHistory.reduce((acc, drawnCards) => {
-                    Object.keys(drawnCards).forEach(cardId => {
+                return packsOpenedHistory.reduce((acc, cardsInDrawnPack) => {
+                    Object.keys(cardsInDrawnPack).forEach(cardId => {
                         const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
                         if (card) {
-                            acc[card.id] = (acc[card.id] || 0) + drawnCards[cardId];
+                            acc[card.id] = (acc[card.id] || 0) + cardsInDrawnPack[cardId];
                         }
                     });
                     return acc;
