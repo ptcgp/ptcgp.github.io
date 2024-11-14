@@ -303,6 +303,11 @@
 
                     const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
                     this.saveTotalDays(totalDays);
+
+                    if (numberOfSimulations == 1) {
+                        this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
+                        this.updateOpenedCount(packsOpenedHistory, targetPack);
+                    }
                 });
                 await Promise.all(promises);
 
@@ -313,8 +318,6 @@
                 } else {
                     $('#output').show();
                     $('#daysChart').hide(); // Hide the day graph
-                    this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
-                    this.updateOpenedCount(packsOpenedHistory, targetPack);
                 }
             }
 
