@@ -478,7 +478,7 @@
 
                 return isCompleteAllPacks
                     ? TCGPSimulator.CARD_LIST.filter(card =>
-                        card.pack !== 'Unlocked' && (card.pack == targetPack || card.pack == 'All') &&
+                        card.pack !== 'Unlocked' &&
                         (!excludeCrownCards || card.rarity !== '♛') &&
                         (!excludeStarCards || !card.rarity.startsWith('☆'))
                     ).length
