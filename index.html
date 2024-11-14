@@ -528,10 +528,10 @@
                 card.pack === targetPack || card.pack === 'All'
             );
             
-            // Sort cards by rarity and name
+            // Sort cards by rarity and id
             packCards.sort((a, b) => {
                 const rarityDiff = RARITIES.indexOf(b.rarity) - RARITIES.indexOf(a.rarity);
-                return rarityDiff !== 0 ? rarityDiff : a['name-en'].localeCompare(b['name-en']);
+                return rarityDiff !== 0 ? rarityDiff : a.id - b.id;
             });
             
             // Add options for each card
@@ -539,7 +539,7 @@
                 $targetCard.append(
                     $('<option>', {
                         value: card.id,
-                        text: `${card.rarity} ${card['name-en']} (${card.id})`
+                        text: `${card.rarity} (${card.id}) ${card['name-en']}`
                     })
                 );
             });
