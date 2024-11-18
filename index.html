@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"> -->
     <style>
         body {
             font-family: var(--bs-body-font-family);
@@ -107,7 +107,7 @@
                 <span id="completenessValue">100%</span>
             </div>
         </div>
-
+<!-- 
         <div class="row mb-3" id="dailyQuestGroup">
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="completeDailyQuest" checked>
@@ -126,7 +126,7 @@
                 </label>
                 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Free shop tickets x5 every 24 hours"></i>
             </div>
-        </div>
+        </div> -->
 
         <div class="row mb-3" id="premiumPassGroup">
             <div class="form-check">
@@ -183,7 +183,7 @@
         <button id="runSimulation" class="btn btn-primary mb-3">Start Unpacking</button>
 
         <table id="output" class="table table-striped">
-            <div id="opened" class="mb-2"></div>
+            <div id="opened" class="mb-2" data-bs-toggle="tooltip" data-bs-placement="right" title="1. "></div>
             <div id="owned" class="mb-2"></div>
             <thead>
                 <tr>
@@ -291,7 +291,6 @@
                 const packsOpenedHistory = [];
                 this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
                 this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
-                this.updateOpenedCount(packsOpenedHistory, targetPack);
             }
 
             async runSimulationPromises(numberOfSimulations, targetPack, language) {
@@ -299,10 +298,8 @@
                     const drawCounts = {};
                     const packsOpenedHistory = [];
                     const completedPacks = [];
-                    this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
-
-                    const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
-                    this.totalDaysData.push(totalDays); 
+                    var day = this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
+                    this.totalDaysData.push(day); 
 
                     if (numberOfSimulations == 1) {
                         this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
@@ -322,34 +319,76 @@
             }
 
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
-                let currentCount = 0;
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
                 const targetCards = this.getFilteredCards(targetPack, false);
                 const filteredCards = this.getFilteredCards(targetPack, true);
-                const ownedCards = new Set()
+                const ownedCards = new Set();
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
 
-                while (ownedCards.size < targetCards.length) {
-                    const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
-                    Object.keys(cardsInDrawnPack).forEach(cardId => {
-                        if (this.isCardOwned(drawCounts, cardId)) {
-                            ownedCards.add(cardId);
-                        }
-                    });
-                    packsOpenedHistory.push(cardsInDrawnPack);
-                    currentCount++;
+                let packHourglass = 0;
+                let wonderPickHourglass = 0;
+                let day = 0;
+                let wonderPickHourglassPerMonthFromShop = 70;
 
-                    if (drawSpecificCard && ownedCards.has(specificCardId)) {
-                        break;
+                loop1:
+                while (ownedCards.size < targetCards.length) {
+                    day++;
+                    packHourglass += 24;
+                    wonderPickHourglass += 24;
+                    
+                    packHourglass += $('#premiumPassCheckbox').is(':checked') ? 12 : 0;
+
+                    if (day % 30 === 1) {
+                        packHourglass += 70; 
+                        wonderPickHourglassPerMonthFromShop = 70;
                     }
 
-                    const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
-                    if (ownedPercentage >= completenessPercentage) {
-                        this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
-                        break;
+                    if (wonderPickHourglass > 60) {
+                        wonderPickHourglass = 60;
+                    }
+
+                    loop2:
+                    while (packHourglass >= 12) {
+                        packHourglass -= 12;  
+                        const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
+                        cardsInDrawnPack.forEach(card => {
+                            if (this.isCardOwned(drawCounts, card)) {
+                                ownedCards.add(card.id);
+                            }
+                        });
+                        packsOpenedHistory.push(cardsInDrawnPack);
+    
+                        if (drawSpecificCard && ownedCards.has(specificCardId)) {
+                            break loop1;
+                        }
+    
+                        const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
+                        if (ownedPercentage >= completenessPercentage) {
+                            this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
+                            break loop1;
+                        }
+                    }
+
+                    while (wonderPickHourglass >= 12) {
+                        wonderPickHourglass -= 12;
+                        //this.wonderPick();
+                    }
+
+                    if (packsOpenedHistory.length >= 50000) {
+                        console.log(ownedCards);
+                        break loop1;
                     }
                 }
+
+                return day;
+            }
+
+            wonderPick(drawCounts, language) {
+                const randomIndex = Math.floor(Math.random() * $("#targetPack option").length);
+                const selectedPack = $("#targetPack option").eq([randomIndex]).val();
+                const filteredCards = this.getFilteredCards(targetPack, true);
+                let pack = this.openPack(null, filteredCards, language);
             }
 
             simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
@@ -360,13 +399,13 @@
             }
 
             openPack(drawCounts, filteredCards, language) {
-                const cardsInDrawnPack = {};
+                const cardsInDrawnPack = [];
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
 
                 drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, rate);
-                    if (card) {
-                        cardsInDrawnPack[card.id] = (cardsInDrawnPack[card.id] || 0) + 1;
+                    cardsInDrawnPack.push(card);
+                    if (drawCounts) {
                         drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
                     }
                 });
@@ -375,7 +414,6 @@
             }
 
             handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
-                console.log(`Pack completed: ${targetPack}`);
                 if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
                     const availablePacks = $('#targetPack option').map(function () {
@@ -383,9 +421,7 @@
                     }).get().filter(pack => !completedPacks.includes(pack));
 
                     if (availablePacks.length > 0) {
-                        console.log(`Available packs: ${availablePacks}`);
                         const nextPack = availablePacks[0];
-                        console.log(`Next pack: ${nextPack}`);
                         this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
                     }
                 }
@@ -402,7 +438,6 @@
             updateOpenedCount(packsOpenedHistory, targetPack) {
                 const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
                 $('#opened').text(`Opened: ${packsOpenedHistory.length} (Total Days: ${totalDays})`);
-                return totalDays;
             }
 
             updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language) {
@@ -439,24 +474,19 @@
                 );
             }
 
-            isCardOwned(drawCounts, cardId) {
-                const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-
+            isCardOwned(drawCounts, card) {
                 const excludeCrown = $('#excludeCrownCards').is(':checked') && card.rarity === '♛';
                 const excludeStar = $('#excludeStarCards').is(':checked') && card.rarity.startsWith('☆');
-                const drawCount = drawCounts[cardId] || 0;
+                const drawCount = drawCounts[card.id] || 0;
                 const drawEachCardTwiceChecked = $('#drawEachCardTwiceCheckbox').is(':checked');
 
                 return !(excludeCrown || excludeStar) && (drawEachCardTwiceChecked ? drawCount >= 2 : true);
             }
 
-            aggregateDrawnCards(packsOpenedHistory) {
+            aggregateDrawnCards(packsOpenedHistory) {    
                 return packsOpenedHistory.reduce((acc, cardsInDrawnPack) => {
-                    Object.keys(cardsInDrawnPack).forEach(cardId => {
-                        const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (card) {
-                            acc[card.id] = (acc[card.id] || 0) + cardsInDrawnPack[cardId];
-                        }
+                    cardsInDrawnPack.forEach(card => {
+                        acc[card.id] = (acc[card.id] || 0) + 1;
                     });
                     return acc;
                 }, {});
