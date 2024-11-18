@@ -257,6 +257,18 @@
             }
 
             async runSimulator(numberSimulations = 500, targetPack = 'Charizard', language = 'en') {
+                this.logSimulationParameters();
+
+                const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+
+                if (drawUntilAllCardsOwned) {
+                    await this.runSimulationPromises(numberSimulations, targetPack, language);
+                } else {
+                    this.handleFixedCountSimulation(numberSimulations, targetPack, language);
+                }
+            }
+
+            logSimulationParameters() {
                 console.log('--------------------------------');
                 console.log('Draw Until All Cards Owned:          ', $('#drawUntilAllCardsOwned').is(':checked'));
                 console.log('Complete All Packs:                  ', $('#completeAllPacks').is(':checked'));
@@ -267,24 +279,19 @@
                 console.log('Target Card:                         ', $('#targetCard').val());
                 console.log('Complete Daily Quest:                ', $('#completeDailyQuest').is(':checked'));
                 console.log('Complete Daily Thanks:               ', $('#completeDailyThanks').is(':checked'));
+                console.log('Premium Pass:                        ', $('#premiumPassCheckbox').is(':checked'));
                 console.log('Draw Each Card Twice:                ', $('#drawEachCardTwiceCheckbox').is(':checked'));
                 console.log('Exclude Crown Cards:                 ', $('#excludeCrownCards').is(':checked'));
                 console.log('Exclude Star Cards:                  ', $('#excludeStarCards').is(':checked'));
-                
-                $('#opened').text('');
-                const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+            }
 
-                if (drawUntilAllCardsOwned) {
-                    const numberOfSimulations = $('#numberSimulations').val();
-                    await this.runSimulationPromises(numberOfSimulations, targetPack, language);
-                } else {
-                    $('#output').show();
-                    const drawCounts = {};
-                    const packsOpenedHistory = [];
-                    this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
-                    this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
-                    this.updateOpenedCount(packsOpenedHistory, targetPack);
-                }
+            handleFixedCountSimulation(numberSimulations, targetPack, language) {
+                $('#output').show();
+                const drawCounts = {};
+                const packsOpenedHistory = [];
+                this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
+                this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
+                this.updateOpenedCount(packsOpenedHistory, targetPack);
             }
 
             async runSimulationPromises(numberOfSimulations, targetPack, language) {
