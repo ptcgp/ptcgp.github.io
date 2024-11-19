@@ -177,10 +177,11 @@
             <div id="owned" class="mb-2"></div>
             <thead>
                 <tr>
-                    <th style="width: 25%">Name</th>
-                    <th style="width: 25%">Rarity</th>
-                    <th style="width: 25%">Count</th>
-                    <th style="width: 25%">Pack</th>
+                    <th style="width: 20%">Name</th>
+                    <th style="width: 20%">Rarity</th>
+                    <th style="width: 20%">Count</th>
+                    <th style="width: 20%">Wonder Pick</th>
+                    <th style="width: 20%">Pack</th>
                 </tr>
             </thead>
             <tbody>
@@ -365,7 +366,7 @@
                     if ($('#wonderPickCheckbox').is(':checked')) {
                         loop3:
                         while (wonderPickHourglass >= 12) {
-                            wonderPickHourglass = this.wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory);
+                            wonderPickHourglass = this.wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards);
                             break loop3;
                         }
                     }
@@ -374,13 +375,12 @@
                 return day;
             }
 
-            wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory) {
-                const randomIndex = Math.floor(Math.random() * $("#targetPack option").length);
-                const selectedPack = $("#targetPack option").eq([randomIndex]).val();
-                const filteredCards = this.getFilteredCards(selectedPack, true);
+            wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards) {
                 let packList = [];
 
-                for (let i = 0; i < 20; i++) { // Loop 20 times
+                const loopTime = $('#completeAllPacks').is(':checked') ? 30 : 10;
+
+                for (let i = 0; i < loopTime; i++) { 
                     let pack = this.openPack(null, filteredCards, language);
 
                     pack.forEach(card => {
@@ -479,11 +479,11 @@
 
                 sortedCards.forEach(({ card, count }) => {
                     const isWonderPicked = drawUntilAllCardsOwned && wonderPickedIds.includes(card.id) ? ' ✔️' : '';
-                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}${isWonderPicked}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${isWonderPicked}</td><td>${card.pack}</td></tr>`);
                 });
                 const completeAllPacks = $('#completeAllPacks').is(':checked');
                 const totalCardsInPack = this.getFilteredCards(targetPack, false, completeAllPacks).length;
-                $('#owned').text(`Owned: ${this.getOwnedCount(drawCounts, finalDrawnCards)}/${totalCardsInPack}`);
+                $('#owned').text(`Owned: ${Object.keys(drawCounts).length}/${totalCardsInPack}`);
             }
 
             randomChoice(array, weights) {
@@ -535,12 +535,6 @@
                     const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.card.rarity) - TCGPSimulator.RARITIES.indexOf(a.card.rarity);
                     return rarityComparison !== 0 ? rarityComparison : b.count - a.count;
                 });
-            }
-
-            getOwnedCount(drawCounts, finalDrawnCards) {
-                return Object.keys(finalDrawnCards).filter(cardId => {
-                    return this.isCardOwned(drawCounts, cardId);
-                }).length;
             }
 
             updateChart() {
