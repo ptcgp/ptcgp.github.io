@@ -119,12 +119,19 @@
         </div>
 
         <div class="row mb-3" id="wonderPickGroup">
-            <div class="form-check">
+            <div class="col form-check">
                 <input type="checkbox" class="form-check-input" id="wonderPickCheckbox">
                 <label class="form-check-label" for="wonderPickCheckbox">
                     Wonder Pick
                 </label>
                 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Select a Wonder Pick card to draw"></i>
+            </div>
+
+            <div class="col">
+                <select class="form-select" id="wonderPickStrategy">
+                    <option value="rare">Choose Rare Card</option>
+                    <option value="basic">Choose Basic Card</option>
+                </select>
             </div>
         </div>
 
@@ -398,18 +405,26 @@
                     return costB - costA; 
                 });
 
+                const wonderPickStrategy = $('#wonderPickStrategy').val();
                 let cardsInDrawnPack = [];
+
                 outerLoop: 
                 packList.forEach(pack => {
+                    innerLoop:
                     pack.forEach(card => {
-                        if (!ownedCards.has(card.id) && 
-                            WONDER_PICK_COST[card.rarity] <= wonderPickHourglass && 
-                            Math.random() < 0.2 && 
-                            WONDER_PICK_COST[card.rarity] > 12 && 
-                            this.isCardOwned(drawCounts, card)) {
-                                ownedCards.add(card.id);
-                                cardsInDrawnPack.push(card);
+                        if (!this.isCardOwned(drawCounts, card) && 
+                            WONDER_PICK_COST[card.rarity] <= wonderPickHourglass &&
+                            ((wonderPickStrategy == 'rare' && WONDER_PICK_COST[card.rarity] >= 36) || (wonderPickStrategy == 'basic' && WONDER_PICK_COST[card.rarity] <= 36))) {
+
+                                if (Math.random() < 0.2) {
+                                    cardsInDrawnPack.push(card);
+                                    if (this.isCardOwned(drawCounts, card)) {
+                                        ownedCards.add(card.id);
+                                    }
+                                }
                                 wonderPickHourglass -= WONDER_PICK_COST[card.rarity];
+                                
+                                return;
                         }
                     });
                 });
