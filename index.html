@@ -129,8 +129,8 @@
 
             <div class="col">
                 <select class="form-select" id="wonderPickStrategy">
-                    <option value="rare">Choose Rare Card</option>
-                    <option value="basic">Choose Basic Card</option>
+                    <option value="rare">Choose Rare Card (☆, ☆☆, ☆☆☆, ♛)</option>
+                    <option value="basic">Choose Basic Card (♢♢♢, ♢♢♢♢)</option>
                 </select>
             </div>
         </div>
@@ -408,27 +408,40 @@
                 const wonderPickStrategy = $('#wonderPickStrategy').val();
                 let cardsInDrawnPack = [];
 
-                outerLoop: 
                 packList.forEach(pack => {
-                    innerLoop:
-                    pack.forEach(card => {
-                        if (!this.isCardOwned(drawCounts, card) && 
-                            WONDER_PICK_COST[card.rarity] <= wonderPickHourglass &&
-                            ((wonderPickStrategy == 'rare' && WONDER_PICK_COST[card.rarity] >= 36) || (wonderPickStrategy == 'basic' && WONDER_PICK_COST[card.rarity] <= 36))) {
+                    
+                    let packCost = 0;
+                    let wanted = false;
 
-                                if (Math.random() < 0.2) {
-                                    cardsInDrawnPack.push(card);
-                                    if (this.isCardOwned(drawCounts, card)) {
-                                        ownedCards.add(card.id);
-                                    }
-                                }
-                                wonderPickHourglass -= WONDER_PICK_COST[card.rarity];
-                                
-                                return;
+                    pack.forEach(card => {
+                        if (WONDER_PICK_COST[card.rarity] > packCost) {
+                            packCost = WONDER_PICK_COST[card.rarity];
+                        }
+
+                        if ( wonderPickStrategy == "rare" && !card.rarity.startsWith("♢")) {
+                            wanted = true;
+                        } else if (wonderPickStrategy == "basic" && card.rarity.startsWith("♢♢♢")) {
+                            wanted = true;
                         }
                     });
+
+                    console.log(packCost);
+
+                    if (wanted && packCost <= wonderPickHourglass) {
+                        wonderPickHourglass -= packCost;
+                        const randomDraw = Math.floor(Math.random() * 5); // Generates a random number between 0 and 4
+                        let card = pack[randomDraw];
+                        cardsInDrawnPack.push(card);
+                        wonderPickHistory.push(pack);
+
+                        if (this.isCardOwned(drawCounts, card)) {
+                            ownedCards.add(card.id);
+                        }
+                    } else if (wonderPickHourglass == 0) {
+                        return 0;
+                    }
                 });
-                wonderPickHistory.push(cardsInDrawnPack);
+
                 return wonderPickHourglass;
             }
 
