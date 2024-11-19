@@ -320,11 +320,13 @@
 
                 if (numberOfSimulations > 1) {
                     $('#output').hide();
-                    $('#daysChart').show(); // Show the day graph
+                    $('#opened').hide();
+                    $('#daysChart').show();
                     this.updateChart();
                 } else {
                     $('#output').show();
-                    $('#daysChart').hide(); // Hide the day graph
+                    $('#opened').show();
+                    $('#daysChart').hide(); 
                 }
             }
 
