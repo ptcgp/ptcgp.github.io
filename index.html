@@ -385,9 +385,7 @@
             wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards) {
                                 let packList = [];
 
-                const loopTime = $('#completeAllPacks').is(':checked') ? 30 : 10;
-
-                for (let i = 0; i < loopTime; i++) { 
+                for (let i = 0; i < 10; i++) { 
                     let pack = this.openPack(null, filteredCards, language);
 
                     pack.forEach(card => {
@@ -466,7 +464,7 @@
                 return cardsInDrawnPack;
             }
 
-            handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
+            handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks, wonderPickHistory) {
                                 if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
                     const availablePacks = $('#targetPack option').map(function () {
