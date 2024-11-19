@@ -184,10 +184,9 @@
             <div id="owned" class="mb-2"></div>
             <thead>
                 <tr>
-                    <th style="width: 20%">Name</th>
+                    <th style="width: 40%">Name</th>
                     <th style="width: 20%">Rarity</th>
-                    <th style="width: 20%">Count</th>
-                    <th style="width: 20%">Wonder Pick</th>
+                    <th style="width: 20%">Total(WP)</th>
                     <th style="width: 20%">Pack</th>
                 </tr>
             </thead>
@@ -378,9 +377,6 @@
                         }
                     }
 
-                    if (day > 10) {
-                        break loop1;
-                    }
                 }
 
                 return day;
@@ -506,12 +502,15 @@
                 if (drawUntilAllCardsOwned) 
                     wonderPickHistory.forEach(pack => wonderPickedIds.push(...pack.map(card => card.id)));
 
+                const finalWonderPickCards = this.aggregateDrawnCards(wonderPickHistory);
+                console.log(finalWonderPickCards);
+
                 const finalDrawnCards = this.aggregateDrawnCards(histories);
                 const sortedCards = this.sortCards(finalDrawnCards);
 
                 sortedCards.forEach(({ card, count }) => {
-                    const isWonderPicked = drawUntilAllCardsOwned && wonderPickedIds.includes(card.id) ? ' ✔️' : '';
-                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${isWonderPicked}</td><td>${card.pack}</td></tr>`);
+                    const wonderPickCountText = finalWonderPickCards[card.id] ? ` (${finalWonderPickCards[card.id]})` : '';
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}${wonderPickCountText}</td><td>${card.pack}</td></tr>`);
                 });
                 const completeAllPacks = $('#completeAllPacks').is(':checked');
                 const totalCardsInPack = this.getFilteredCards(targetPack, false, completeAllPacks).length;
