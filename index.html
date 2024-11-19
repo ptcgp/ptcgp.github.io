@@ -292,21 +292,21 @@
             }
 
             async runSimulationPromises(numberOfSimulations, targetPack, language) {
-                const promises = Array.from({ length: numberOfSimulations }, () => {
+                                const promises = Array.from({ length: numberOfSimulations }, () => {
                     const drawCounts = {};
                     const packsOpenedHistory = [];
                     const wonderPickHistory = [];
                     const completedPacks = [];
                     var day = this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, targetPack, language, completedPacks);
                     this.totalDaysData.push(day); 
-
+                    
                     if (numberOfSimulations == 1) {
                         this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language, wonderPickHistory);
                         this.updateOpenedCount(packsOpenedHistory, targetPack);
                     }
                 });
                 await Promise.all(promises);
-
+                
                 if (numberOfSimulations > 1) {
                     $('#output').hide();
                     $('#daysChart').show(); // Show the day graph
@@ -318,7 +318,7 @@
             }
 
             simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, targetPack, language, completedPacks) {
-                const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
+                                const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
                 const targetCards = this.getFilteredCards(targetPack, false);
                 const filteredCards = this.getFilteredCards(targetPack, true);
                 const ownedCards = new Set();
@@ -364,7 +364,7 @@
     
                         const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
                         if (ownedPercentage >= completenessPercentage) {
-                            this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
+                            this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks, wonderPickHistory);
                             break loop1;
                         }
                     }
@@ -379,11 +379,11 @@
 
                 }
 
-                return day;
+                                return day;
             }
 
             wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards) {
-                let packList = [];
+                                let packList = [];
 
                 const loopTime = $('#completeAllPacks').is(':checked') ? 30 : 10;
 
@@ -442,7 +442,7 @@
                     }
                 });
 
-                return wonderPickHourglass;
+                                return wonderPickHourglass;
             }
 
             simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
@@ -456,7 +456,7 @@
                 const cardsInDrawnPack = [];
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
 
-                drawRates.forEach(rate => {
+                                drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, rate);
                     cardsInDrawnPack.push(card);
                     if (drawCounts) {
@@ -467,7 +467,7 @@
             }
 
             handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
-                if ($('#completeAllPacks').is(':checked')) {
+                                if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
                     const availablePacks = $('#targetPack option').map(function () {
                         return $(this).val();
@@ -475,7 +475,7 @@
 
                     if (availablePacks.length > 0) {
                         const nextPack = availablePacks[0];
-                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
+                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, nextPack, language, completedPacks);
                     }
                 }
             }
@@ -495,26 +495,17 @@
 
             updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language, wonderPickHistory) {
                 const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+                const histories = drawUntilAllCardsOwned ? packsOpenedHistory.concat(wonderPickHistory) : packsOpenedHistory;
 
-                let wonderPickedIds = [];
-                let histories = drawUntilAllCardsOwned ? packsOpenedHistory.concat(wonderPickHistory) : packsOpenedHistory;
-
-                if (drawUntilAllCardsOwned) 
-                    wonderPickHistory.forEach(pack => wonderPickedIds.push(...pack.map(card => card.id)));
-
+                const wonderPickedIds = drawUntilAllCardsOwned ? wonderPickHistory.flatMap(pack => pack.map(card => card.id)) : [];
                 const finalWonderPickCards = this.aggregateDrawnCards(wonderPickHistory);
-                console.log(finalWonderPickCards);
-
-                const finalDrawnCards = this.aggregateDrawnCards(histories);
-                const sortedCards = this.sortCards(finalDrawnCards);
+                const sortedCards = this.sortCards(this.aggregateDrawnCards(histories));
 
                 sortedCards.forEach(({ card, count }) => {
-                    const wonderPickCountText = finalWonderPickCards[card.id] ? ` (${finalWonderPickCards[card.id]})` : '';
-                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}${wonderPickCountText}</td><td>${card.pack}</td></tr>`);
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}${finalWonderPickCards[card.id] ? ` (${finalWonderPickCards[card.id]})` : ''}</td><td>${card.pack}</td></tr>`);
                 });
-                const completeAllPacks = $('#completeAllPacks').is(':checked');
-                const totalCardsInPack = this.getFilteredCards(targetPack, false, completeAllPacks).length;
-                $('#owned').text(`Owned: ${Object.keys(drawCounts).length}/${totalCardsInPack}`);
+
+                $('#owned').text(`Owned: ${Object.keys(drawCounts).length}/${this.getFilteredCards(targetPack, false, $('#completeAllPacks').is(':checked')).length}`);
             }
 
             randomChoice(array, weights) {
