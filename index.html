@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
@@ -51,12 +51,13 @@
                 <label class="form-check-label" for="completeAllPacks">
                     Complete All Packs
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Switch to next pack when all cards are owned"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Switch to next pack when all cards are owned"></i>
             </div>
         </div>
 
         <div class="row mb-3" id="targetPackGroup">
-            <div class="col form-check">                
+            <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="targetPack">Pack:</label>
             </div>
@@ -75,7 +76,8 @@
                 <label class="form-check-label" for="drawSpecificCard">
                     Draw Specific Card
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Stop when specific card is drawn"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Stop when specific card is drawn"></i>
             </div>
             <div class="col">
                 <select class="form-select" id="targetCard">
@@ -87,7 +89,8 @@
             <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="numberSimulations">Simulations Count:</label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="May crash if too high"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="May crash if too high"></i>
             </div>
             <div class="col">
                 <input type="number" class="form-control" id="numberSimulations" value="100" min="1" max="99999">
@@ -98,7 +101,8 @@
             <div class="col form-check">
                 <input type="checkbox" class="form-check-input" disabled />
                 <label class="form-label" for="completenessSlider">Completeness:</label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Stop when completeness is reached"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Stop when completeness is reached"></i>
             </div>
             <div class="col">
                 <input type="range" class="form-range" id="completenessSlider" min="1" max="100" value="100">
@@ -108,23 +112,32 @@
             </div>
         </div>
 
-        <div class="row mb-3" id="dailyQuestGroup">
+        <div class="row mb-3" id="premiumPassGroup">
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="completeDailyQuest" checked>
-                <label class="form-check-label" for="completeDailyQuest">
-                    Complete Daily Quest
+                <input type="checkbox" class="form-check-input" id="premiumPassCheckbox">
+                <label class="form-check-label" for="premiumPassCheckbox">
+                    Premium Pass
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Free shop tickets every 24 hours"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Free card pack every 24 hours with Premium Pass"></i>
             </div>
         </div>
 
-        <div class="row mb-3" id="dailyThanksGroup">
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="completeDailyThanks" checked>
-                <label class="form-check-label" for="completeDailyThanks">
-                    Complete Daily Thanks
+        <div class="row mb-3" id="wonderPickGroup">
+            <div class="col form-check">
+                <input type="checkbox" class="form-check-input" id="wonderPickCheckbox">
+                <label class="form-check-label" for="wonderPickCheckbox">
+                    Wonder Pick
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Free shop tickets x5 every 24 hours"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Select a Wonder Pick card to draw"></i>
+            </div>
+
+            <div class="col">
+                <select class="form-select" id="wonderPickStrategy">
+                    <option value="rare">Choose Rare Card (☆, ☆☆, ☆☆☆, ♛)</option>
+                    <option value="basic">Choose Basic Card (♢♢♢, ♢♢♢♢)</option>
+                </select>
             </div>
         </div>
 
@@ -134,7 +147,8 @@
                 <label class="form-check-label" for="drawEachCardTwiceCheckbox">
                     Draw each card x2
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Count as owned when drawn twice"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Count as owned when drawn twice"></i>
             </div>
         </div>
 
@@ -144,7 +158,8 @@
                 <label class="form-check-label" for="excludeCrownCards">
                     Exclude Crown ♛ Cards
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude Crown cards when counting owned"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Exclude Crown cards when counting owned"></i>
             </div>
         </div>
 
@@ -154,7 +169,8 @@
                 <label class="form-check-label" for="excludeStarCards">
                     Exclude Star ☆ Cards
                 </label>
-                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" title="Exclude star cards when counting owned"></i>
+                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Exclude star cards when counting owned"></i>
             </div>
         </div>
 
@@ -173,21 +189,23 @@
         <button id="runSimulation" class="btn btn-primary mb-3">Start Unpacking</button>
 
         <table id="output" class="table table-striped">
-            <div id="opened" class="mb-2"></div>
+            <div id="opened" class="mb-2" data-bs-toggle="tooltip" data-bs-placement="right"
+                title="1. Assuming 2 packs per day\n 2. Assuming buy all monthly shop hourglasses at 1st of the month">
+            </div>
             <div id="owned" class="mb-2"></div>
             <thead>
                 <tr>
-                    <th style="width: 25%">Name</th>
-                    <th style="width: 25%">Rarity</th>
-                    <th style="width: 25%">Count</th>
-                    <th style="width: 25%">Pack</th>
+                    <th style="width: 40%">Name</th>
+                    <th style="width: 20%">Rarity</th>
+                    <th style="width: 20%">Total(WP)</th>
+                    <th style="width: 20%">Pack</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Card data will be appended here -->
             </tbody>
         </table>
-        
+
         <!-- <div class="progress mb-3">
             <div class="progress-bar" role="progressbar" style="width: 0%;" id="simulationProgress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
         </div> -->
@@ -218,21 +236,19 @@
                 $('#completenessValue').text(this.value + '%');
             });
 
-            $('#drawSpecificCard').change(function() {
+            $('#drawSpecificCard').change(function () {
                 $('#excludeCrownCards, #excludeStarCards').prop('checked', false).prop('disabled', this.checked);
             });
 
-            $('#completeAllPacks').change(function() {
-                const isChecked = this.checked;
-                $('#drawSpecificCard').prop({ checked: !isChecked, disabled: isChecked });
-                $('#targetPack, #targetCard').prop('disabled', isChecked);
-                $('#excludeCrownCards, #excludeStarCards').prop({ checked: false, disabled: false });
+            $('#completeAllPacks').change(function () {
+                $('#targetPack, #targetCard').prop('disabled', false);
+                $('#excludeCrownCards, #excludeStarCards, drawSpecificCard').prop({ checked: false, disabled: false });
             });
         });
     </script>
 
     <script type="module">
-        import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST } from './data.js';
+        import { RARITIES, PACK_RATES, DRAW_RATES, CARD_LIST, COSTS, WONDER_PICK_COST } from './data.js';
 
         let chart = null;
 
@@ -241,12 +257,26 @@
             static PACK_RATES = PACK_RATES;
             static DRAW_RATES = DRAW_RATES;
             static CARD_LIST = CARD_LIST;
+            static COSTS = COSTS;
+            static WONDER_PICK_COST = WONDER_PICK_COST;
 
             constructor() {
-                this.totalDaysData = []; // Initialize the array to store total days
+                this.totalDaysData = [];
             }
 
             async runSimulator(numberSimulations = 500, targetPack = 'Charizard', language = 'en') {
+                this.logSimulationParameters();
+
+                const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+
+                if (drawUntilAllCardsOwned) {
+                    await this.runSimulationPromises(numberSimulations, targetPack, language);
+                } else {
+                    this.handleFixedCountSimulation(numberSimulations, targetPack, language);
+                }
+            }
+
+            logSimulationParameters() {
                 console.log('--------------------------------');
                 console.log('Draw Until All Cards Owned:          ', $('#drawUntilAllCardsOwned').is(':checked'));
                 console.log('Complete All Packs:                  ', $('#completeAllPacks').is(':checked'));
@@ -257,38 +287,32 @@
                 console.log('Target Card:                         ', $('#targetCard').val());
                 console.log('Complete Daily Quest:                ', $('#completeDailyQuest').is(':checked'));
                 console.log('Complete Daily Thanks:               ', $('#completeDailyThanks').is(':checked'));
+                console.log('Premium Pass:                        ', $('#premiumPassCheckbox').is(':checked'));
                 console.log('Draw Each Card Twice:                ', $('#drawEachCardTwiceCheckbox').is(':checked'));
                 console.log('Exclude Crown Cards:                 ', $('#excludeCrownCards').is(':checked'));
                 console.log('Exclude Star Cards:                  ', $('#excludeStarCards').is(':checked'));
-                
-                $('#opened').text('');
-                const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+            }
 
-                if (drawUntilAllCardsOwned) {
-                    const numberOfSimulations = $('#numberSimulations').val();
-                    await this.runSimulationPromises(numberOfSimulations, targetPack, language);
-                } else {
-                    $('#output').show();
-                    const drawCounts = {};
-                    const packsOpenedHistory = [];
-                    this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
-                    this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
-                    this.updateOpenedCount(packsOpenedHistory, targetPack);
-                }
+            handleFixedCountSimulation(numberSimulations, targetPack, language) {
+                $('#output').show();
+                $('#opened').hide();
+                const drawCounts = {};
+                const packsOpenedHistory = [];
+                this.simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language);
+                this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language, {});
             }
 
             async runSimulationPromises(numberOfSimulations, targetPack, language) {
                 const promises = Array.from({ length: numberOfSimulations }, () => {
                     const drawCounts = {};
                     const packsOpenedHistory = [];
+                    const wonderPickHistory = [];
                     const completedPacks = [];
-                    this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
-
-                    const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
-                    this.totalDaysData.push(totalDays); 
+                    var day = this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, targetPack, language, completedPacks);
+                    this.totalDaysData.push(day);
 
                     if (numberOfSimulations == 1) {
-                        this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language);
+                        this.updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language, wonderPickHistory);
                         this.updateOpenedCount(packsOpenedHistory, targetPack);
                     }
                 });
@@ -296,43 +320,138 @@
 
                 if (numberOfSimulations > 1) {
                     $('#output').hide();
-                    $('#daysChart').show(); // Show the day graph
+                    $('#opened').hide();
+                    $('#daysChart').show();
                     this.updateChart();
                 } else {
                     $('#output').show();
-                    $('#daysChart').hide(); // Hide the day graph
+                    $('#opened').show();
+                    $('#daysChart').hide(); 
                 }
             }
 
-            simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
-                let currentCount = 0;
+            simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, targetPack, language, completedPacks) {
                 const completenessPercentage = parseFloat($('#completenessValue').text()) || 0;
                 const targetCards = this.getFilteredCards(targetPack, false);
                 const filteredCards = this.getFilteredCards(targetPack, true);
-                const ownedCards = new Set()
+                const ownedCards = new Set();
                 const specificCardId = $('#targetCard').val();
                 const drawSpecificCard = $('#drawSpecificCard').is(':checked');
 
+                let packHourglass = 0;
+                let wonderPickHourglass = 0;
+                let day = 0;
+                let wonderPickHourglassPerMonthFromShop = 70;
+
+                loop1:
                 while (ownedCards.size < targetCards.length) {
-                    const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
-                    Object.keys(cardsInDrawnPack).forEach(cardId => {
-                        if (this.isCardOwned(drawCounts, cardId)) {
-                            ownedCards.add(cardId);
+                    day++;
+                    packHourglass += 24;
+                    wonderPickHourglass += 24;
+
+                    packHourglass += $('#premiumPassCheckbox').is(':checked') ? 12 : 0;
+
+                    if (day % 30 === 1) {
+                        packHourglass += 70;
+                        wonderPickHourglassPerMonthFromShop = 70;
+                    }
+
+                    if (wonderPickHourglass > 60) {
+                        wonderPickHourglass = 60;
+                    }
+
+                    loop2:
+                    while (packHourglass >= 12) {
+                        packHourglass -= 12;
+                        const cardsInDrawnPack = this.openPack(drawCounts, filteredCards, language);
+                        cardsInDrawnPack.forEach(card => {
+                            if (this.isCardOwned(drawCounts, card)) {
+                                ownedCards.add(card.id);
+                            }
+                        });
+                        packsOpenedHistory.push(cardsInDrawnPack);
+
+                        if (drawSpecificCard && ownedCards.has(specificCardId)) {
+                            break loop1;
+                        }
+
+                        const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
+                        if (ownedPercentage >= completenessPercentage) {
+                            this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks, wonderPickHistory);
+                            break loop1;
+                        }
+                    }
+
+                    if ($('#wonderPickCheckbox').is(':checked')) {
+                        loop3:
+                        while (wonderPickHourglass >= 12) {
+                            wonderPickHourglass = this.wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards);
+                            break loop3;
+                        }
+                    }
+
+                }
+
+                return day;
+            }
+
+            wonderPick(drawCounts, language, ownedCards, wonderPickHourglass, wonderPickHistory, filteredCards) {
+                let packList = [];
+
+                for (let i = 0; i < 10; i++) {
+                    let pack = this.openPack(null, filteredCards, language);
+
+                    pack.forEach(card => {
+                        if (['☆☆☆', '♛'].includes(card.rarity)) {
+                            card = this.randomChoice(filteredCards, TCGPSimulator.DRAW_RATES['rare']);
                         }
                     });
-                    packsOpenedHistory.push(cardsInDrawnPack);
-                    currentCount++;
 
-                    if (drawSpecificCard && ownedCards.has(specificCardId)) {
-                        break;
-                    }
-
-                    const ownedPercentage = (ownedCards.size / targetCards.length) * 100;
-                    if (ownedPercentage >= completenessPercentage) {
-                        this.handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks);
-                        break;
-                    }
+                    packList.push(pack);
                 }
+
+                packList.sort((a, b) => {
+                    const costA = a.reduce((sum, card) => sum + COSTS[card.rarity], 0);
+                    const costB = b.reduce((sum, card) => sum + COSTS[card.rarity], 0);
+                    return costB - costA;
+                });
+
+                const wonderPickStrategy = $('#wonderPickStrategy').val();
+                let cardsInDrawnPack = [];
+
+                packList.forEach(pack => {
+
+                    let packCost = 0;
+                    let wanted = false;
+
+                    pack.forEach(card => {
+                        if (WONDER_PICK_COST[card.rarity] > packCost) {
+                            packCost = WONDER_PICK_COST[card.rarity];
+                        }
+
+                        if (wonderPickStrategy == "rare" && !card.rarity.startsWith("♢")) {
+                            wanted = true;
+                        } else if (wonderPickStrategy == "basic" && card.rarity.startsWith("♢♢♢")) {
+                            wanted = true;
+                        }
+                    });
+
+                    if (wanted && packCost <= wonderPickHourglass) {
+                        wonderPickHourglass -= packCost;
+                        const randomDraw = Math.floor(Math.random() * 5); // Generates a random number between 0 and 4
+                        let card = pack[randomDraw];
+                        cardsInDrawnPack.push(card);
+                        wonderPickHistory.push(pack);
+
+                        if (this.isCardOwned(drawCounts, card)) {
+                            ownedCards.add(card.id);
+                        }
+                    } else if (wonderPickHourglass == 0) {
+                        return 0;
+                    }
+                });
+
+                return wonderPickHourglass;
             }
 
             simulateFixedCount(drawCounts, packsOpenedHistory, numberSimulations, targetPack, language) {
@@ -343,22 +462,20 @@
             }
 
             openPack(drawCounts, filteredCards, language) {
-                const cardsInDrawnPack = {};
+                const cardsInDrawnPack = [];
                 const drawRates = TCGPSimulator.DRAW_RATES[Math.random() < TCGPSimulator.PACK_RATES[1] ? 'rare' : 'regular'];
 
                 drawRates.forEach(rate => {
                     const card = this.randomChoice(filteredCards, rate);
-                    if (card) {
-                        cardsInDrawnPack[card.id] = (cardsInDrawnPack[card.id] || 0) + 1;
+                    cardsInDrawnPack.push(card);
+                    if (drawCounts) {
                         drawCounts[card.id] = (drawCounts[card.id] || 0) + 1;
                     }
                 });
-
                 return cardsInDrawnPack;
             }
 
-            handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks) {
-                console.log(`Pack completed: ${targetPack}`);
+            handlePackCompletion(drawCounts, packsOpenedHistory, targetPack, language, completedPacks, wonderPickHistory) {
                 if ($('#completeAllPacks').is(':checked')) {
                     completedPacks.push(targetPack);
                     const availablePacks = $('#targetPack option').map(function () {
@@ -366,33 +483,38 @@
                     }).get().filter(pack => !completedPacks.includes(pack));
 
                     if (availablePacks.length > 0) {
-                        console.log(`Available packs: ${availablePacks}`);
                         const nextPack = availablePacks[0];
-                        console.log(`Next pack: ${nextPack}`);
-                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, nextPack, language, completedPacks);
+                        this.simulateUntilAllCardsOwned(drawCounts, packsOpenedHistory, wonderPickHistory, nextPack, language, completedPacks);
                     }
                 }
             }
 
             getOpenedCount(packsOpenedHistory, targetPack) {
-                const adjustedPacksPerDay = (24 + (1 / 3) + ($('#completeDailyQuest').is(':checked') ? 4 : 0) + ($('#completeDailyThanks').is(':checked') ? (5 / 6) : 0)) / 12;
+                const adjustedPacksPerDay = (24 + (1 / 3)
+                    + ($('#completeDailyQuest').is(':checked') ? 4 : 0)
+                    + ($('#completeDailyThanks').is(':checked') ? (5 / 6) : 0)
+                    + ($('#premiumPassCheckbox').is(':checked') ? 12 : 0)) / 12;
                 return Math.ceil(packsOpenedHistory.length / adjustedPacksPerDay);
             }
 
             updateOpenedCount(packsOpenedHistory, targetPack) {
                 const totalDays = this.getOpenedCount(packsOpenedHistory, targetPack);
                 $('#opened').text(`Opened: ${packsOpenedHistory.length} (Total Days: ${totalDays})`);
-                return totalDays;
             }
 
-            updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language) {
-                const finalDrawnCards = this.aggregateDrawnCards(packsOpenedHistory);
-                const sortedCards = this.sortCards(finalDrawnCards);
+            updateOutputTable(drawCounts, packsOpenedHistory, targetPack, language, wonderPickHistory) {
+                const drawUntilAllCardsOwned = $('#drawUntilAllCardsOwned').is(':checked');
+                const histories = drawUntilAllCardsOwned ? packsOpenedHistory.concat(wonderPickHistory) : packsOpenedHistory;
+
+                const wonderPickedIds = drawUntilAllCardsOwned ? wonderPickHistory.flatMap(pack => pack.map(card => card.id)) : [];
+                const finalWonderPickCards = this.aggregateDrawnCards(wonderPickHistory);
+                const sortedCards = this.sortCards(this.aggregateDrawnCards(histories));
+
                 sortedCards.forEach(({ card, count }) => {
-                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}</td><td>${card.pack}</td></tr>`);
+                    $('#output tbody').append(`<tr><td>(${card.id}) ${card[`name-${language}`]}</td><td>${card.rarity}</td><td>${count}${finalWonderPickCards[card.id] ? ` (${finalWonderPickCards[card.id]})` : ''}</td><td>${card.pack}</td></tr>`);
                 });
-                const totalCardsInPack = this.getFilteredCards(targetPack, false).length;
-                $('#owned').text(`Owned: ${this.getOwnedCount(drawCounts, finalDrawnCards)}/${totalCardsInPack}`);
+
+                $('#owned').text(`Owned: ${Object.keys(drawCounts).length}/${this.getFilteredCards(targetPack, false, $('#completeAllPacks').is(':checked')).length}`);
             }
 
             randomChoice(array, weights) {
@@ -407,22 +529,21 @@
                 }
             }
 
-            getFilteredCards(targetPack, overrideRarity = false) {
+            getFilteredCards(targetPack, overrideRarity = false, completeAllPacks = false) {
                 const excludeCrownCards = overrideRarity ? false : $('#excludeCrownCards').is(':checked');
                 const excludeStarCards = overrideRarity ? false : $('#excludeStarCards').is(':checked');
                 return TCGPSimulator.CARD_LIST.filter(card =>
-                    (card.pack === targetPack || card.pack === 'All') &&
+                    ((completeAllPacks || card.pack === targetPack) || card.pack === 'All') &&
+                    card.pack != "Unlocked" &&
                     (!excludeCrownCards || card.rarity !== '♛') &&
                     (!excludeStarCards || !card.rarity.startsWith('☆'))
                 );
             }
 
-            isCardOwned(drawCounts, cardId) {
-                const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-
+            isCardOwned(drawCounts, card) {
                 const excludeCrown = $('#excludeCrownCards').is(':checked') && card.rarity === '♛';
                 const excludeStar = $('#excludeStarCards').is(':checked') && card.rarity.startsWith('☆');
-                const drawCount = drawCounts[cardId] || 0;
+                const drawCount = drawCounts[card.id] || 0;
                 const drawEachCardTwiceChecked = $('#drawEachCardTwiceCheckbox').is(':checked');
 
                 return !(excludeCrown || excludeStar) && (drawEachCardTwiceChecked ? drawCount >= 2 : true);
@@ -430,11 +551,8 @@
 
             aggregateDrawnCards(packsOpenedHistory) {
                 return packsOpenedHistory.reduce((acc, cardsInDrawnPack) => {
-                    Object.keys(cardsInDrawnPack).forEach(cardId => {
-                        const card = TCGPSimulator.CARD_LIST.find(c => c.id === cardId);
-                        if (card) {
-                            acc[card.id] = (acc[card.id] || 0) + cardsInDrawnPack[cardId];
-                        }
+                    cardsInDrawnPack.forEach(card => {
+                        acc[card.id] = (acc[card.id] || 0) + 1;
                     });
                     return acc;
                 }, {});
@@ -448,12 +566,6 @@
                     const rarityComparison = TCGPSimulator.RARITIES.indexOf(b.card.rarity) - TCGPSimulator.RARITIES.indexOf(a.card.rarity);
                     return rarityComparison !== 0 ? rarityComparison : b.count - a.count;
                 });
-            }
-
-            getOwnedCount(drawCounts, finalDrawnCards) {
-                return Object.keys(finalDrawnCards).filter(cardId => {
-                    return this.isCardOwned(drawCounts, cardId);
-                }).length;
             }
 
             updateChart() {
@@ -498,18 +610,18 @@
         function updateTargetCardOptions(targetPack) {
             const $targetCard = $('#targetCard');
             $targetCard.empty(); // Clear existing options
-            
+
             // Filter cards based on selected pack
-            const packCards = CARD_LIST.filter(card => 
+            const packCards = CARD_LIST.filter(card =>
                 card.pack === targetPack || card.pack === 'All'
             );
-            
+
             // Sort cards by rarity and id
             packCards.sort((a, b) => {
                 const rarityDiff = RARITIES.indexOf(b.rarity) - RARITIES.indexOf(a.rarity);
                 return rarityDiff !== 0 ? rarityDiff : a.id - b.id;
             });
-            
+
             // Add options for each card
             packCards.forEach(card => {
                 $targetCard.append(
@@ -537,7 +649,13 @@
                 const language = $('#languageSelect').val();
                 const numberSimulations = $('#numberSimulations').val();
                 const openingSimulator = new TCGPSimulator();
-                openingSimulator.runSimulator(numberSimulations, targetPack, language);
+
+                const startTime = performance.now(); // Start time measurement
+                openingSimulator.runSimulator(numberSimulations, targetPack, language).then(() => {
+                    const endTime = performance.now(); // End time measurement
+                    const timeTaken = (endTime - startTime) / 1000; // Convert to seconds
+                    console.log(`Time taken: ${timeTaken.toFixed(2)} seconds`); // Log time taken
+                });
 
                 if ($.fn.DataTable.isDataTable('#output')) {
                     $('#output').DataTable().clear();
@@ -545,15 +663,17 @@
             });
 
             // Add event listener for pack selection
-            $('#targetPack').change(function() {
+            $('#targetPack').change(function () {
                 updateTargetCardOptions($(this).val());
             });
-            
+
             // Initialize card options for default pack
             updateTargetCardOptions($('#targetPack').val());
         });
     </script>
 
 </body>
+
+</html>
 
 </html>
