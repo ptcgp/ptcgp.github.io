@@ -348,6 +348,12 @@
             const drawRates = DRAW_RATES[packType];
             const rateTable = isGodPack ? drawRates.rare : drawRates.regular;
             const results = new Array(RARITIES.length).fill(0);
+            const drawnCards = new Array(RARITIES.length); // Track which specific cards we drew
+            
+            // Initialize arrays to track unique cards for each rarity
+            for (let i = 0; i < RARITIES.length; i++) {
+                drawnCards[i] = null;
+            }
 
             rateTable.forEach(rates => {
                 const random = Math.random();
@@ -356,20 +362,31 @@
                 for (let i = 0; i < rates.length; i++) {
                     cumulative += rates[i];
                     if (random <= cumulative) {
+                        // When we draw a card of rarity i, randomly select which specific card number it is
+                        const cardCount = PACK_CARD_COUNTS[packType][i];
+                        if (cardCount > 0) {
+                            const specificCard = Math.floor(Math.random() * cardCount) + 1;
+                            drawnCards[i] = specificCard;
+                        }
                         results[i]++;
                         break;
                     }
                 }
             });
 
-            return results;
+            return { counts: results, cards: drawnCards };
         }
 
         function isCollectionComplete(collection, cardCounts, excludeRareCards = false) {
             const lastIndexToCheck = excludeRareCards ? 4 : cardCounts.length;
             for (let i = 0; i < lastIndexToCheck; i++) {
-                if (cardCounts[i] > 0 && collection[i] < cardCounts[i]) {
-                    return false;
+                if (cardCounts[i] > 0) {
+                    // Check if we have all unique cards for this rarity
+                    for (let cardNum = 1; cardNum <= cardCounts[i]; cardNum++) {
+                        if (!collection[i].has(cardNum)) {
+                            return false;
+                        }
+                    }
                 }
             }
             return true;
@@ -377,16 +394,22 @@
 
         function simulateCollection(packType, excludeRareCards = false) {
             const cardCounts = PACK_CARD_COUNTS[packType];
-            const collection = new Array(cardCounts.length).fill(0);
+            const collection = new Array(cardCounts.length);
+            for (let i = 0; i < cardCounts.length; i++) {
+                collection[i] = new Set();
+            }
             let packCount = 0;
 
             while (!isCollectionComplete(collection, cardCounts, excludeRareCards)) {
                 packCount++;
                 const isGodPack = Math.random() > PACK_RATES[0];
-                const packResults = simulatePackOpening(packType, isGodPack);
+                const result = simulatePackOpening(packType, isGodPack);
                 
-                for (let i = 0; i < collection.length; i++) {
-                    collection[i] = Math.min(collection[i] + packResults[i], cardCounts[i] || 0);
+                // Add any new unique cards to our collection
+                for (let i = 0; i < result.counts.length; i++) {
+                    if (result.counts[i] > 0 && result.cards[i] !== null) {
+                        collection[i].add(result.cards[i]);
+                    }
                 }
             }
 
@@ -542,13 +565,13 @@
                         godPacks++;
                         const packResults = simulatePackOpening(packType, true);
                         for (let j = 0; j < results.length; j++) {
-                            results[j] += packResults[j];
+                            results[j] += packResults.counts[j];
                         }
                     } else {
                         regularPacks++;
                         const packResults = simulatePackOpening(packType, false);
                         for (let j = 0; j < results.length; j++) {
-                            results[j] += packResults[j];
+                            results[j] += packResults.counts[j];
                         }
                     }
                 }
@@ -819,7 +842,7 @@
                     const isGodPack = Math.random() > PACK_RATES[0];
                     const packResults = simulatePackOpening(packType, isGodPack);
                     
-                    if (packResults[targetRarity] > 0) {
+                    if (packResults.counts[targetRarity] > 0) {
                         // When we pull a card of the right rarity, we have 1/N chance of it being our target card
                         // where N is the total number of different cards of that rarity
                         const randomCard = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
