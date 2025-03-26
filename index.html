@@ -62,6 +62,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="specific-tab" data-bs-toggle="tab" data-bs-target="#specific" type="button" role="tab" aria-controls="specific" aria-selected="false">Specific Card</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="gold-tab" data-bs-toggle="tab" data-bs-target="#gold" type="button" role="tab" aria-controls="gold" aria-selected="false">Gold Calculator</button>
+                    </li>
                 </ul>
 
                 <div class="tab-content" id="simTabsContent">
@@ -341,6 +344,98 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Gold Calculator Tab -->
+                    <div class="tab-pane fade" id="gold" role="tabpanel">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="targetPacks" class="form-label">Number of Packs</label>
+                                <input type="number" class="form-control" id="targetPacks" min="1" value="100">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="currency" class="form-label">Currency</label>
+                                <select class="form-select" id="currency">
+                                    <option value="HKD">HKD (Hong Kong Dollar)</option>
+                                    <option value="JPY">JPY (Japanese Yen)</option>
+                                    <option value="USD">USD (US Dollar)</option>
+                                    <option value="GBP">GBP (British Pound)</option>
+                                    <option value="EUR">EUR (Euro)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button id="calculateGoldBtn" class="btn btn-primary w-100">Calculate</button>
+                            </div>
+                        </div>
+
+                        <div class="results-section">
+                            <h2 class="h4 mb-4">Gold Purchase Plans</h2>
+                            <div class="row">
+                                <!-- Plan A: Suggested Package -->
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h3 class="h5 mb-0">Plan A: Single Package</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="result-item mb-2">
+                                                <strong>Package:</strong>
+                                                <span id="planAGold">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Total Cost:</strong>
+                                                <span id="planACost">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Packs You Get:</strong>
+                                                <span id="planAPacks">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Cost Per Pack:</strong>
+                                                <span id="planAPerPack">-</span>
+                                            </div>
+                                            <div class="result-item text-success">
+                                                <strong>Extra Packs:</strong>
+                                                <span id="planAExtra">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plan B: Exact Gold -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-secondary text-white">
+                                            <h3 class="h5 mb-0">Plan B: Multiple Packages</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="result-item mb-2">
+                                                <strong>Total Gold:</strong>
+                                                <span id="planBGold">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Total Cost:</strong>
+                                                <span id="planBCost">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Packs You Get:</strong>
+                                                <span id="planBPacks">-</span>
+                                            </div>
+                                            <div class="result-item mb-2">
+                                                <strong>Cost Per Pack:</strong>
+                                                <span id="planBPerPack">-</span>
+                                            </div>
+                                            <div class="mt-3">
+                                                <strong>Required Packages:</strong>
+                                                <ul id="planBPurchases" class="list-unstyled mt-2 mb-0">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -352,7 +447,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script type="module">
-        import { RARITIES, PACK_RATES, PACK_CARD_COUNTS, DRAW_RATES } from './data.js';
+        import { RARITIES, PACK_RATES, PACK_CARD_COUNTS, DRAW_RATES, gold_price } from './data.js';
 
         let collectionChart = null;
         let specificChart = null; // Add global variable for specific chart
@@ -1044,6 +1139,113 @@
                     // Start processing batches
                     processBatch();
                 }, 50);
+            });
+
+            // Gold Calculator
+            function findOptimalGoldPackage(targetGold) {
+                // Get all available gold amounts from the first currency (they're all the same)
+                const goldAmounts = Object.keys(gold_price.HKD).map(Number).sort((a, b) => a - b);
+                const largestPackage = goldAmounts[goldAmounts.length - 1];
+
+                if (targetGold <= largestPackage) {
+                    // Find the smallest package that's greater than or equal to target gold
+                    for (const amount of goldAmounts) {
+                        if (amount >= targetGold) {
+                            return {
+                                gold: amount,
+                                count: 1
+                            };
+                        }
+                    }
+                }
+                
+                // If we need more than the largest package, calculate how many we need
+                const packagesNeeded = Math.ceil(targetGold / largestPackage);
+                return {
+                    gold: largestPackage,
+                    count: packagesNeeded
+                };
+            }
+
+            function calculateOptimalGoldPurchase(targetGold, currency) {
+                const prices = gold_price[currency];
+                const goldAmounts = Object.keys(prices).map(Number).sort((a, b) => b - a);
+                const result = {
+                    purchases: {},
+                    totalCost: 0
+                };
+
+                let remainingGold = targetGold;
+
+                // Greedy algorithm - start with largest packages
+                for (const amount of goldAmounts) {
+                    if (remainingGold >= amount) {
+                        const count = Math.floor(remainingGold / amount);
+                        result.purchases[amount] = count;
+                        result.totalCost += prices[amount] * count;
+                        remainingGold -= amount * count;
+                    }
+                }
+
+                // If we can't exactly match the target, add one more package
+                if (remainingGold > 0) {
+                    // Find the smallest package that covers the remaining gold
+                    for (const amount of [...goldAmounts].reverse()) {
+                        if (amount >= remainingGold) {
+                            result.purchases[amount] = (result.purchases[amount] || 0) + 1;
+                            result.totalCost += prices[amount];
+                            break;
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            $('#calculateGoldBtn').on('click', function() {
+                const targetPacks = parseInt($('#targetPacks').val());
+                const currency = $('#currency').val();
+                const goldPerPack = 6; // Each pack costs 6 gold
+
+                // Plan A: Suggested single package
+                const totalGold = targetPacks * goldPerPack;
+                const suggestion = findOptimalGoldPackage(totalGold);
+                const suggestedGold = suggestion.gold;
+                const suggestedCount = suggestion.count;
+                const suggestedPrice = gold_price[currency][suggestedGold] * suggestedCount;
+                const packsFromSuggested = Math.floor((suggestedGold * suggestedCount) / goldPerPack);
+                const avgSuggestedPrice = suggestedPrice / packsFromSuggested;
+                const extraPacks = packsFromSuggested - targetPacks;
+
+                // Plan B: Exact gold needed
+                const plan = calculateOptimalGoldPurchase(totalGold, currency);
+                const avgExactPrice = plan.totalCost / targetPacks;
+                
+                // Update Plan A results
+                $('#planAGold').text(suggestedCount > 1 ? 
+                    `${suggestedCount}x ${suggestedGold} Gold` : 
+                    `${suggestedGold} Gold`);
+                $('#planACost').text(`${currency} ${suggestedPrice.toFixed(2)}`);
+                $('#planAPacks').text(packsFromSuggested);
+                $('#planAPerPack').text(`${currency} ${avgSuggestedPrice.toFixed(2)}`);
+                $('#planAExtra').text(`+${extraPacks} packs`);
+
+                // Update Plan B results
+                $('#planBGold').text(`${totalGold} Gold`);
+                $('#planBCost').text(`${currency} ${plan.totalCost.toFixed(2)}`);
+                $('#planBPacks').text(targetPacks);
+                $('#planBPerPack').text(`${currency} ${avgExactPrice.toFixed(2)}`);
+                
+                // Update Plan B purchase list
+                const $planB = $('#planBPurchases').empty();
+                Object.entries(plan.purchases).sort((a, b) => b[0] - a[0]).forEach(([gold, count]) => {
+                    const cost = gold_price[currency][gold];
+                    $planB.append(`
+                        <li class="mb-2">
+                            ${count}x ${gold} Gold (${currency} ${cost.toFixed(2)} each)
+                        </li>
+                    `);
+                });
             });
         });
     </script>
