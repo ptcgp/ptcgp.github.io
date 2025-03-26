@@ -1,4 +1,4 @@
-export const RARITIES = ["♢", "♢♢", "♢♢♢", "♢♢♢♢", "☆", "☆☆", "☆☆☆", "♛", "S", "SSR"];
+export const RARITIES = ["♢", "♢♢", "♢♢♢", "♢♢♢♢", "☆", "☆☆", "☆☆☆", "♛", "Shiny ☆", "Shiny ☆☆"];
 
 export const PACK_RATES = [0.9995, 0.0005];
 

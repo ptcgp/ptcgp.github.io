@@ -110,7 +110,7 @@
                                             <th>Rarity</th>
                                             <th>Different Cards</th>
                                             <th>Regular Pack Rate</th>
-                                            <th>Rare Pack Rate</th>
+                                            <th>God Pack Rate</th>
                                             <th>Cards Pulled</th>
                                             <th>Pull Rate</th>
                                         </tr>
@@ -163,6 +163,13 @@
                             </div>
                         </div>
 
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="excludeRareCards">
+                            <label class="form-check-label" for="excludeRareCards">
+                                Only collect common cards (♢, ♢♢ ,♢♢♢ ,♢♢♢♢)
+                            </label>
+                        </div>
+
                         <div class="results-section">
                             <h2 class="h4 mb-4">Collection Completion Results (10000 trials)</h2>
                             <div id="chartContainer" style="height: 500px;">
@@ -180,6 +187,10 @@
                                             <span id="avgPacks1">-</span>
                                         </div>
                                         <div class="result-item d-flex justify-content-between">
+                                            <span>Median Packs:</span>
+                                            <span id="medianPacks1">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
                                             <span>Minimum Packs:</span>
                                             <span id="minPacks1">-</span>
                                         </div>
@@ -193,6 +204,10 @@
                                         <div class="result-item d-flex justify-content-between">
                                             <span>Average Packs:</span>
                                             <span id="avgPacks2">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Median Packs:</span>
+                                            <span id="medianPacks2">-</span>
                                         </div>
                                         <div class="result-item d-flex justify-content-between">
                                             <span>Minimum Packs:</span>
@@ -222,9 +237,9 @@
 
         let collectionChart = null;
 
-        function simulatePackOpening(packType, isRarePack) {
+        function simulatePackOpening(packType, isGodPack) {
             const drawRates = DRAW_RATES[packType];
-            const rateTable = isRarePack ? drawRates.rare : drawRates.regular;
+            const rateTable = isGodPack ? drawRates.rare : drawRates.regular;
             const results = new Array(RARITIES.length).fill(0);
 
             rateTable.forEach(rates => {
@@ -243,15 +258,25 @@
             return results;
         }
 
-        function simulateCollection(packType) {
+        function isCollectionComplete(collection, cardCounts, excludeRareCards = false) {
+            const lastIndexToCheck = excludeRareCards ? 4 : cardCounts.length;
+            for (let i = 0; i < lastIndexToCheck; i++) {
+                if (cardCounts[i] > 0 && collection[i] < cardCounts[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function simulateCollection(packType, excludeRareCards = false) {
             const cardCounts = PACK_CARD_COUNTS[packType];
-            const collection = new Array(RARITIES.length).fill(0);
+            const collection = new Array(cardCounts.length).fill(0);
             let packCount = 0;
 
-            while (!isCollectionComplete(collection, cardCounts)) {
+            while (!isCollectionComplete(collection, cardCounts, excludeRareCards)) {
                 packCount++;
-                const isRarePack = Math.random() > PACK_RATES[0];
-                const packResults = simulatePackOpening(packType, isRarePack);
+                const isGodPack = Math.random() > PACK_RATES[0];
+                const packResults = simulatePackOpening(packType, isGodPack);
                 
                 for (let i = 0; i < collection.length; i++) {
                     collection[i] = Math.min(collection[i] + packResults[i], cardCounts[i] || 0);
@@ -259,13 +284,6 @@
             }
 
             return packCount;
-        }
-
-        function isCollectionComplete(collection, targetCounts) {
-            return collection.every((count, index) => {
-                const target = targetCounts[index] || 0;
-                return target === 0 || count >= target;
-            });
         }
 
         function updateChart(data) {
@@ -369,14 +387,14 @@
                 $error.addClass('d-none');
 
                 let regularPacks = 0;
-                let rarePacks = 0;
+                let godPacks = 0;
                 const results = new Array(RARITIES.length).fill(0);
 
                 // Simulate packs
                 for (let i = 0; i < packCount; i++) {
-                    const isRarePack = Math.random() < PACK_RATES[1];
-                    if (isRarePack) {
-                        rarePacks++;
+                    const isGodPack = Math.random() < PACK_RATES[1];
+                    if (isGodPack) {
+                        godPacks++;
                         const packResults = simulatePackOpening(packType, true);
                         for (let j = 0; j < results.length; j++) {
                             results[j] += packResults[j];
@@ -397,8 +415,8 @@
                         <span>${regularPacks} (${((regularPacks / packCount) * 100).toFixed(2)}%)</span>
                     </div>
                     <div class="result-item d-flex justify-content-between">
-                        <span>Rare Packs:</span>
-                        <span>${rarePacks} (${((rarePacks / packCount) * 100).toFixed(2)}%)</span>
+                        <span>God Packs:</span>
+                        <span>${godPacks} (${((godPacks / packCount) * 100).toFixed(2)}%)</span>
                     </div>
                 `;
                 $('#packResults').html(packDistHtml);
@@ -412,7 +430,7 @@
                     if (count > 0) {
                         // Calculate average rates from draw rates
                         const regularRate = drawRates.regular.reduce((sum, rates) => sum + rates[index], 0) / drawRates.regular.length;
-                        const rareRate = drawRates.rare.reduce((sum, rates) => sum + rates[index], 0) / drawRates.rare.length;
+                        const godRate = drawRates.rare.reduce((sum, rates) => sum + rates[index], 0) / drawRates.rare.length;
                         
                         const pullRate = (results[index] / totalCards * 100).toFixed(2);
                         return `
@@ -420,7 +438,7 @@
                                 <td>${RARITIES[index]}</td>
                                 <td>${count}</td>
                                 <td>${(regularRate * 100).toFixed(2)}%</td>
-                                <td>${(rareRate * 100).toFixed(2)}%</td>
+                                <td>${(godRate * 100).toFixed(2)}%</td>
                                 <td>${results[index]}</td>
                                 <td>${pullRate}%</td>
                             </tr>
@@ -437,6 +455,7 @@
             $('#simulateCollectionBtn').on('click', function() {
                 const packType1 = $('#collectionPackType1').val();
                 const packType2 = $('#collectionPackType2').val();
+                const excludeRareCards = $('#excludeRareCards').is(':checked');
                 const $chartContainer = $('#chartContainer');
                 const $progressBar = $('.progress-bar');
                 const $stats2Container = $('#stats2Container');
@@ -456,9 +475,9 @@
 
                     function processBatch() {
                         for (let i = 0; i < batchSize && processed < totalTrials; i++) {
-                            results1.push(simulateCollection(packType1));
+                            results1.push(simulateCollection(packType1, excludeRareCards));
                             if (packType2) {
-                                results2.push(simulateCollection(packType2));
+                                results2.push(simulateCollection(packType2, excludeRareCards));
                             }
                             processed++;
                         }
@@ -472,23 +491,29 @@
                             setTimeout(processBatch, 0);
                         } else {
                             // Calculate statistics for pack type 1
+                            const sortedResults1 = [...results1].sort((a, b) => a - b);
                             const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
+                            const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
                             const min1 = Math.min(...results1);
                             const max1 = Math.max(...results1);
 
                             // Update pack type 1 statistics
                             $('#avgPacks1').text(avg1);
+                            $('#medianPacks1').text(median1);
                             $('#minPacks1').text(min1);
                             $('#maxPacks1').text(max1);
 
                             if (packType2) {
                                 // Calculate statistics for pack type 2
+                                const sortedResults2 = [...results2].sort((a, b) => a - b);
                                 const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
+                                const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
                                 const min2 = Math.min(...results2);
                                 const max2 = Math.max(...results2);
 
                                 // Update pack type 2 statistics
                                 $('#avgPacks2').text(avg2);
+                                $('#medianPacks2').text(median2);
                                 $('#minPacks2').text(min2);
                                 $('#maxPacks2').text(max2);
                                 $stats2Container.show();
