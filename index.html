@@ -169,6 +169,13 @@
                             </label>
                         </div>
 
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="doubleCollection">
+                            <label class="form-check-label" for="doubleCollection">
+                                x2 for all cards (collect each variation twice)
+                            </label>
+                        </div>
+
                         <div class="results-section">
                             <h2 class="h4 mb-4">Collection Completion Results (10000 trials)</h2>
                             <div id="chartContainer" style="height: 500px;">
@@ -377,13 +384,16 @@
             return { counts: results, cards: drawnCards };
         }
 
-        function isCollectionComplete(collection, cardCounts, excludeRareCards = false) {
+        function isCollectionComplete(collection, cardCounts, excludeRareCards = false, needDouble = false) {
             const lastIndexToCheck = excludeRareCards ? 4 : cardCounts.length;
+            const requiredCopies = needDouble ? 2 : 1;
+            
             for (let i = 0; i < lastIndexToCheck; i++) {
                 if (cardCounts[i] > 0) {
                     // Check if we have all unique cards for this rarity
                     for (let cardNum = 1; cardNum <= cardCounts[i]; cardNum++) {
-                        if (!collection[i].has(cardNum)) {
+                        const currentCount = collection[i].get(cardNum) || 0;
+                        if (currentCount < requiredCopies) {
                             return false;
                         }
                     }
@@ -392,15 +402,35 @@
             return true;
         }
 
-        function simulateCollection(packType, excludeRareCards = false) {
+        function simulateCollection(packType, excludeRareCards = false, needDouble = false) {
             const cardCounts = PACK_CARD_COUNTS[packType];
+            // Use Map instead of Set to track count of each card
             const collection = new Array(cardCounts.length);
             for (let i = 0; i < cardCounts.length; i++) {
-                collection[i] = new Set();
+                collection[i] = new Map();
             }
             let packCount = 0;
 
-            while (!isCollectionComplete(collection, cardCounts, excludeRareCards)) {
+            // Helper function to check if collection is complete
+            function isComplete() {
+                const lastIndexToCheck = excludeRareCards ? 4 : cardCounts.length;
+                const requiredCopies = needDouble ? 2 : 1;
+                
+                for (let i = 0; i < lastIndexToCheck; i++) {
+                    if (cardCounts[i] > 0) {
+                        // Check if we have all unique cards for this rarity
+                        for (let cardNum = 1; cardNum <= cardCounts[i]; cardNum++) {
+                            const currentCount = collection[i].get(cardNum) || 0;
+                            if (currentCount < requiredCopies) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
+            while (!isComplete()) {
                 packCount++;
                 const isGodPack = Math.random() > PACK_RATES[0];
                 const result = simulatePackOpening(packType, isGodPack);
@@ -408,7 +438,12 @@
                 // Add any new unique cards to our collection
                 for (let i = 0; i < result.counts.length; i++) {
                     if (result.counts[i] > 0 && result.cards[i] !== null) {
-                        collection[i].add(result.cards[i]);
+                        const cardNum = result.cards[i];
+                        const currentCount = collection[i].get(cardNum) || 0;
+                        // Only increment if we need more copies
+                        if (!needDouble || currentCount < 2) {
+                            collection[i].set(cardNum, currentCount + 1);
+                        }
                     }
                 }
             }
@@ -541,6 +576,137 @@
             });
         }
 
+        function updateSpecificChart(data1, rarity1, results2 = null, rarity2 = null) {
+            const ctx = document.getElementById('specificChart').getContext('2d');
+            
+            // Properly destroy existing chart
+            if (specificChart) {
+                specificChart.destroy();
+            }
+
+            const binSize = 10;
+            const datasets = [];
+
+            // Process data for rarity 1
+            const bins1 = {};
+            const maxPacks1 = Math.max(...data1);
+            
+            // Initialize bins
+            for (let i = 0; i <= maxPacks1; i += binSize) {
+                bins1[i] = 0;
+            }
+
+            // Count trials in each bin
+            data1.forEach(value => {
+                const bin = Math.floor(value / binSize) * binSize;
+                bins1[bin] = (bins1[bin] || 0) + 1;
+            });
+
+            // Convert to cumulative distribution
+            const sortedBins1 = Object.keys(bins1).sort((a, b) => Number(a) - Number(b));
+            const cumulativeData1 = [];
+            let cumulative1 = 0;
+            const totalTrials = data1.length;
+
+            sortedBins1.forEach(bin => {
+                cumulative1 += bins1[bin];
+                const percentage = (cumulative1 / totalTrials) * 100;
+                cumulativeData1.push({
+                    x: Number(bin),
+                    y: percentage
+                });
+            });
+
+            // Store chart instance in global variable
+            datasets.push({
+                label: `${RARITIES[rarity1]} Pull Rate`,
+                data: cumulativeData1,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                fill: true,
+                tension: 0.4
+            });
+
+            // Process data for rarity 2 if exists
+            if (results2 && results2.length > 0) {
+                const bins2 = {};
+                const maxPacks2 = Math.max(...results2);
+                
+                // Initialize bins
+                for (let i = 0; i <= maxPacks2; i += binSize) {
+                    bins2[i] = 0;
+                }
+
+                // Count trials in each bin
+                results2.forEach(value => {
+                    const bin = Math.floor(value / binSize) * binSize;
+                    bins2[bin] = (bins2[bin] || 0) + 1;
+                });
+
+                // Convert to cumulative distribution
+                const sortedBins2 = Object.keys(bins2).sort((a, b) => Number(a) - Number(b));
+                const cumulativeData2 = [];
+                let cumulative2 = 0;
+
+                sortedBins2.forEach(bin => {
+                    cumulative2 += bins2[bin];
+                    const percentage = (cumulative2 / totalTrials) * 100;
+                    cumulativeData2.push({
+                        x: Number(bin),
+                        y: percentage
+                    });
+                });
+
+                datasets.push({
+                    label: `${RARITIES[rarity2]} Pull Rate`,
+                    data: cumulativeData2,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                });
+            }
+
+            specificChart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Trials Successful (%)'
+                            }
+                        },
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Number of Packs Needed'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cumulative Probability of Getting Target Cards'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% chance within ${context.parsed.x} packs`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         $(document).ready(function() {
             // Pack Simulator
             $('#simulateBtn').on('click', function() {
@@ -624,6 +790,7 @@
                 const packType1 = $('#collectionPackType1').val();
                 const packType2 = $('#collectionPackType2').val();
                 const excludeRareCards = $('#excludeRareCards').is(':checked');
+                const needDouble = $('#doubleCollection').is(':checked');
                 const $chartContainer = $('#chartContainer');
                 const $progressBar = $('.progress-bar');
                 const $stats2Container = $('#stats2Container');
@@ -642,9 +809,9 @@
 
                     function processBatch() {
                         for (let i = 0; i < batchSize && processed < totalTrials; i++) {
-                            results1.push(simulateCollection(packType1, excludeRareCards));
+                            results1.push(simulateCollection(packType1, excludeRareCards, needDouble));
                             if (packType2) {
-                                results2.push(simulateCollection(packType2, excludeRareCards));
+                                results2.push(simulateCollection(packType2, excludeRareCards, needDouble));
                             }
                             processed++;
                         }
@@ -698,137 +865,6 @@
                     processBatch();
                 }, 50);
             });
-
-            function updateSpecificChart(data1, rarity1, results2 = null, rarity2 = null) {
-                const ctx = document.getElementById('specificChart').getContext('2d');
-                
-                // Properly destroy existing chart
-                if (specificChart) {
-                    specificChart.destroy();
-                }
-
-                const binSize = 10;
-                const datasets = [];
-
-                // Process data for rarity 1
-                const bins1 = {};
-                const maxPacks1 = Math.max(...data1);
-                
-                // Initialize bins
-                for (let i = 0; i <= maxPacks1; i += binSize) {
-                    bins1[i] = 0;
-                }
-
-                // Count trials in each bin
-                data1.forEach(value => {
-                    const bin = Math.floor(value / binSize) * binSize;
-                    bins1[bin] = (bins1[bin] || 0) + 1;
-                });
-
-                // Convert to cumulative distribution
-                const sortedBins1 = Object.keys(bins1).sort((a, b) => Number(a) - Number(b));
-                const cumulativeData1 = [];
-                let cumulative1 = 0;
-                const totalTrials = data1.length;
-
-                sortedBins1.forEach(bin => {
-                    cumulative1 += bins1[bin];
-                    const percentage = (cumulative1 / totalTrials) * 100;
-                    cumulativeData1.push({
-                        x: Number(bin),
-                        y: percentage
-                    });
-                });
-
-                // Store chart instance in global variable
-                datasets.push({
-                    label: `${RARITIES[rarity1]} Pull Rate`,
-                    data: cumulativeData1,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                });
-
-                // Process data for rarity 2 if exists
-                if (results2 && results2.length > 0) {
-                    const bins2 = {};
-                    const maxPacks2 = Math.max(...results2);
-                    
-                    // Initialize bins
-                    for (let i = 0; i <= maxPacks2; i += binSize) {
-                        bins2[i] = 0;
-                    }
-
-                    // Count trials in each bin
-                    results2.forEach(value => {
-                        const bin = Math.floor(value / binSize) * binSize;
-                        bins2[bin] = (bins2[bin] || 0) + 1;
-                    });
-
-                    // Convert to cumulative distribution
-                    const sortedBins2 = Object.keys(bins2).sort((a, b) => Number(a) - Number(b));
-                    const cumulativeData2 = [];
-                    let cumulative2 = 0;
-
-                    sortedBins2.forEach(bin => {
-                        cumulative2 += bins2[bin];
-                        const percentage = (cumulative2 / totalTrials) * 100;
-                        cumulativeData2.push({
-                            x: Number(bin),
-                            y: percentage
-                        });
-                    });
-
-                    datasets.push({
-                        label: `${RARITIES[rarity2]} Pull Rate`,
-                        data: cumulativeData2,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    });
-                }
-
-                specificChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { datasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                title: {
-                                    display: true,
-                                    text: 'Percentage of Trials Successful (%)'
-                                }
-                            },
-                            x: {
-                                type: 'linear',
-                                title: {
-                                    display: true,
-                                    text: 'Number of Packs Needed'
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Cumulative Probability of Getting Target Cards'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% chance within ${context.parsed.x} packs`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
 
             function simulateSpecificCard(packType, targetRarity) {
                 const cardCounts = PACK_CARD_COUNTS[packType];
