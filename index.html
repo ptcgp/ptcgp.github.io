@@ -54,14 +54,13 @@
                 
                 <ul class="nav nav-tabs mb-4" id="simTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pack-tab" data-bs-toggle="tab" data-bs-target="#pack" type="button" role="tab">
-                            Pack Simulator
-                        </button>
+                        <button class="nav-link active" id="pack-tab" data-bs-toggle="tab" data-bs-target="#pack" type="button" role="tab" aria-controls="pack" aria-selected="true">Pack Simulator</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="collection-tab" data-bs-toggle="tab" data-bs-target="#collection" type="button" role="tab">
-                            Collection Simulator
-                        </button>
+                        <button class="nav-link" id="collection-tab" data-bs-toggle="tab" data-bs-target="#collection" type="button" role="tab" aria-controls="collection" aria-selected="false">Collection Simulator</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="specific-tab" data-bs-toggle="tab" data-bs-target="#specific" type="button" role="tab" aria-controls="specific" aria-selected="false">Specific Card</button>
                     </li>
                 </ul>
 
@@ -166,7 +165,7 @@
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="excludeRareCards">
                             <label class="form-check-label" for="excludeRareCards">
-                                Only collect common cards (♢, ♢♢ ,♢♢♢ ,♢♢♢♢)
+                                Only collect common cards (, , , )
                             </label>
                         </div>
 
@@ -222,6 +221,113 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Specific Card Tab -->
+                    <div class="tab-pane fade" id="specific" role="tabpanel">
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-6">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="specificPackType1" class="form-label">Pack Type 1</label>
+                                        <select id="specificPackType1" class="form-select">
+                                            <option value="a1_pikachu">A1 Pikachu</option>
+                                            <option value="a1_mewtwo">A1 Mewtwo</option>
+                                            <option value="a1_charizard">A1 Charizard</option>
+                                            <option value="a1a">A1A Mew</option>
+                                            <option value="a2_diagla">A2 Diagla</option>
+                                            <option value="a2_palkia">A2 Palkia</option>
+                                            <option value="a2a">A2A</option>
+                                            <option value="a2b">A2B</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="targetRarity1" class="form-label">Target Rarity 1</label>
+                                        <select id="targetRarity1" class="form-select">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="specificPackType2" class="form-label">Pack Type 2 (Optional)</label>
+                                        <select id="specificPackType2" class="form-select">
+                                            <option value="">None</option>
+                                            <option value="a1_pikachu">A1 Pikachu</option>
+                                            <option value="a1_mewtwo">A1 Mewtwo</option>
+                                            <option value="a1_charizard">A1 Charizard</option>
+                                            <option value="a1a">A1A Mew</option>
+                                            <option value="a2_diagla">A2 Diagla</option>
+                                            <option value="a2_palkia">A2 Palkia</option>
+                                            <option value="a2a">A2A</option>
+                                            <option value="a2b">A2B</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="targetRarity2" class="form-label">Target Rarity 2</label>
+                                        <select id="targetRarity2" class="form-select" disabled>
+                                            <option value="">Select Pack Type 2 first</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button id="simulateSpecificBtn" class="btn btn-primary">Simulate</button>
+                            </div>
+                        </div>
+
+                        <div class="results-section">
+                            <h2 class="h4 mb-4">Packs Needed for Target Cards (10000 trials)</h2>
+                            <div id="specificChartContainer" style="height: 500px;">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <canvas id="specificChart"></canvas>
+                            </div>
+                            <div id="specificStats" class="mt-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="h5">Rarity 1 Statistics</h3>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Average Packs:</span>
+                                            <span id="avgPacksSpecific1">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Median Packs:</span>
+                                            <span id="medianPacksSpecific1">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Minimum Packs:</span>
+                                            <span id="minPacksSpecific1">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Maximum Packs:</span>
+                                            <span id="maxPacksSpecific1">-</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" id="stats2ContainerSpecific" style="display: none;">
+                                        <h3 class="h5">Rarity 2 Statistics</h3>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Average Packs:</span>
+                                            <span id="avgPacksSpecific2">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Median Packs:</span>
+                                            <span id="medianPacksSpecific2">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Minimum Packs:</span>
+                                            <span id="minPacksSpecific2">-</span>
+                                        </div>
+                                        <div class="result-item d-flex justify-content-between">
+                                            <span>Maximum Packs:</span>
+                                            <span id="maxPacksSpecific2">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -236,6 +342,7 @@
         import { RARITIES, PACK_RATES, PACK_CARD_COUNTS, DRAW_RATES } from './data.js';
 
         let collectionChart = null;
+        let specificChart = null; // Add global variable for specific chart
 
         function simulatePackOpening(packType, isGodPack) {
             const drawRates = DRAW_RATES[packType];
@@ -286,7 +393,7 @@
             return packCount;
         }
 
-        function updateChart(data) {
+        function updateChart(data1, label1, data2, label2) {
             const ctx = document.getElementById('collectionChart').getContext('2d');
             
             if (collectionChart) {
@@ -294,48 +401,86 @@
             }
 
             const binSize = 10;
-            const bins = {};
-            const maxPacks = Math.max(...data);
+            const datasets = [];
+
+            // Process data for pack type 1
+            const bins1 = {};
+            const maxPacks1 = Math.max(...data1);
             
-            // Initialize bins
-            for (let i = 0; i <= maxPacks; i += binSize) {
-                bins[i] = 0;
+            for (let i = 0; i <= maxPacks1; i += binSize) {
+                bins1[i] = 0;
             }
 
-            // Count trials in each bin
-            data.forEach(value => {
+            data1.forEach(value => {
                 const bin = Math.floor(value / binSize) * binSize;
-                bins[bin] = (bins[bin] || 0) + 1;
+                bins1[bin] = (bins1[bin] || 0) + 1;
             });
 
-            // Convert to cumulative distribution
-            const sortedBins = Object.keys(bins).sort((a, b) => Number(a) - Number(b));
-            const cumulativeData = [];
-            let cumulative = 0;
-            const totalTrials = data.length;
+            const sortedBins1 = Object.keys(bins1).sort((a, b) => Number(a) - Number(b));
+            const cumulativeData1 = [];
+            let cumulative1 = 0;
+            const totalTrials = data1.length;
 
-            sortedBins.forEach(bin => {
-                cumulative += bins[bin];
+            sortedBins1.forEach(bin => {
+                cumulative1 += bins1[bin];
                 // Convert to percentage
-                const percentage = (cumulative / totalTrials) * 100;
-                cumulativeData.push({
+                const percentage = (cumulative1 / totalTrials) * 100;
+                cumulativeData1.push({
                     x: Number(bin),
                     y: percentage
                 });
             });
 
+            datasets.push({
+                label: `${label1} Completion Rate`,
+                data: cumulativeData1,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                fill: true,
+                tension: 0.4
+            });
+
+            // Process data for pack type 2 if exists
+            if (data2 && data2.length > 0) {
+                const bins2 = {};
+                const maxPacks2 = Math.max(...data2);
+                
+                for (let i = 0; i <= maxPacks2; i += binSize) {
+                    bins2[i] = 0;
+                }
+
+                data2.forEach(value => {
+                    const bin = Math.floor(value / binSize) * binSize;
+                    bins2[bin] = (bins2[bin] || 0) + 1;
+                });
+
+                const sortedBins2 = Object.keys(bins2).sort((a, b) => Number(a) - Number(b));
+                const cumulativeData2 = [];
+                let cumulative2 = 0;
+
+                sortedBins2.forEach(bin => {
+                    cumulative2 += bins2[bin];
+                    // Convert to percentage
+                    const percentage = (cumulative2 / totalTrials) * 100;
+                    cumulativeData2.push({
+                        x: Number(bin),
+                        y: percentage
+                    });
+                });
+
+                datasets.push({
+                    label: `${label2} Completion Rate`,
+                    data: cumulativeData2,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                });
+            }
+
             collectionChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    datasets: [{
-                        label: 'Cumulative Completion Rate (%)',
-                        data: cumulativeData,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
+                data: { datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -364,7 +509,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.parsed.y.toFixed(1)}% completed within ${context.parsed.x} packs`;
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% completed within ${context.parsed.x} packs`;
                                 }
                             }
                         }
@@ -465,7 +610,6 @@
                 $chartContainer.attr('data-progress', 'Simulating... 0%');
                 $progressBar.css('width', '0%').attr('aria-valuenow', 0);
                 
-                // Use setTimeout to allow the UI to update before starting the simulation
                 setTimeout(() => {
                     const results1 = [];
                     const results2 = [];
@@ -523,7 +667,7 @@
 
                             // Remove loading state and update chart
                             $chartContainer.removeClass('loading');
-                            updateCollectionChart(results1, packType1, results2, packType2);
+                            updateChart(results1, packType1, results2, packType2);
                         }
                     }
 
@@ -532,29 +676,33 @@
                 }, 50);
             });
 
-            function updateCollectionChart(data1, label1, data2, label2) {
-                const ctx = document.getElementById('collectionChart').getContext('2d');
+            function updateSpecificChart(data1, rarity1, results2 = null, rarity2 = null) {
+                const ctx = document.getElementById('specificChart').getContext('2d');
                 
-                if (collectionChart) {
-                    collectionChart.destroy();
+                // Properly destroy existing chart
+                if (specificChart) {
+                    specificChart.destroy();
                 }
 
                 const binSize = 10;
                 const datasets = [];
 
-                // Process data for pack type 1
+                // Process data for rarity 1
                 const bins1 = {};
                 const maxPacks1 = Math.max(...data1);
                 
+                // Initialize bins
                 for (let i = 0; i <= maxPacks1; i += binSize) {
                     bins1[i] = 0;
                 }
 
+                // Count trials in each bin
                 data1.forEach(value => {
                     const bin = Math.floor(value / binSize) * binSize;
                     bins1[bin] = (bins1[bin] || 0) + 1;
                 });
 
+                // Convert to cumulative distribution
                 const sortedBins1 = Object.keys(bins1).sort((a, b) => Number(a) - Number(b));
                 const cumulativeData1 = [];
                 let cumulative1 = 0;
@@ -569,8 +717,9 @@
                     });
                 });
 
+                // Store chart instance in global variable
                 datasets.push({
-                    label: `${label1} Completion Rate`,
+                    label: `${RARITIES[rarity1]} Pull Rate`,
                     data: cumulativeData1,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.1)',
@@ -578,20 +727,23 @@
                     tension: 0.4
                 });
 
-                // Process data for pack type 2 if exists
-                if (data2 && data2.length > 0) {
+                // Process data for rarity 2 if exists
+                if (results2 && results2.length > 0) {
                     const bins2 = {};
-                    const maxPacks2 = Math.max(...data2);
+                    const maxPacks2 = Math.max(...results2);
                     
+                    // Initialize bins
                     for (let i = 0; i <= maxPacks2; i += binSize) {
                         bins2[i] = 0;
                     }
 
-                    data2.forEach(value => {
+                    // Count trials in each bin
+                    results2.forEach(value => {
                         const bin = Math.floor(value / binSize) * binSize;
                         bins2[bin] = (bins2[bin] || 0) + 1;
                     });
 
+                    // Convert to cumulative distribution
                     const sortedBins2 = Object.keys(bins2).sort((a, b) => Number(a) - Number(b));
                     const cumulativeData2 = [];
                     let cumulative2 = 0;
@@ -606,7 +758,7 @@
                     });
 
                     datasets.push({
-                        label: `${label2} Completion Rate`,
+                        label: `${RARITIES[rarity2]} Pull Rate`,
                         data: cumulativeData2,
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.1)',
@@ -615,7 +767,7 @@
                     });
                 }
 
-                collectionChart = new Chart(ctx, {
+                specificChart = new Chart(ctx, {
                     type: 'line',
                     data: { datasets },
                     options: {
@@ -627,7 +779,7 @@
                                 max: 100,
                                 title: {
                                     display: true,
-                                    text: 'Percentage of Trials Completed (%)'
+                                    text: 'Percentage of Trials Successful (%)'
                                 }
                             },
                             x: {
@@ -641,12 +793,12 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Cumulative Probability of Completing Collection'
+                                text: 'Cumulative Probability of Getting Target Cards'
                             },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% completed within ${context.parsed.x} packs`;
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% chance within ${context.parsed.x} packs`;
                                     }
                                 }
                             }
@@ -654,6 +806,152 @@
                     }
                 });
             }
+
+            function simulateSpecificCard(packType, targetRarity) {
+                const cardCounts = PACK_CARD_COUNTS[packType];
+                // Randomly select which specific card number we want (1 to total cards of that rarity)
+                const targetCardNumber = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
+                let packCount = 0;
+                let found = false;
+
+                while (!found) {
+                    packCount++;
+                    const isGodPack = Math.random() > PACK_RATES[0];
+                    const packResults = simulatePackOpening(packType, isGodPack);
+                    
+                    if (packResults[targetRarity] > 0) {
+                        // When we pull a card of the right rarity, we have 1/N chance of it being our target card
+                        // where N is the total number of different cards of that rarity
+                        const randomCard = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
+                        if (randomCard === targetCardNumber) {
+                            found = true;
+                        }
+                    }
+                }
+
+                return packCount;
+            }
+
+            // Populate target rarity dropdowns based on pack type
+            function updateTargetRarityOptions() {
+                // Update first pack's rarities
+                const packType1 = $('#specificPackType1').val();
+                const cardCounts1 = PACK_CARD_COUNTS[packType1];
+                const $targetRarity1 = $('#targetRarity1');
+                
+                $targetRarity1.empty();
+                cardCounts1.forEach((count, index) => {
+                    if (count > 0) {
+                        const optionText = `${RARITIES[index]} (${count} different cards)`;
+                        $targetRarity1.append(`<option value="${index}">${optionText}</option>`);
+                    }
+                });
+
+                // Update second pack's rarities
+                const packType2 = $('#specificPackType2').val();
+                const $targetRarity2 = $('#targetRarity2');
+                
+                if (packType2) {
+                    const cardCounts2 = PACK_CARD_COUNTS[packType2];
+                    $targetRarity2.empty();
+                    cardCounts2.forEach((count, index) => {
+                        if (count > 0) {
+                            const optionText = `${RARITIES[index]} (${count} different cards)`;
+                            $targetRarity2.append(`<option value="${index}">${optionText}</option>`);
+                        }
+                    });
+                    $targetRarity2.prop('disabled', false);
+                } else {
+                    $targetRarity2.empty();
+                    $targetRarity2.append('<option value="">Select Pack Type 2 first</option>');
+                    $targetRarity2.prop('disabled', true);
+                }
+            }
+
+            // Initialize target rarity options
+            updateTargetRarityOptions();
+            $('#specificPackType1, #specificPackType2').on('change', updateTargetRarityOptions);
+
+            // Specific Card Simulator
+            $('#simulateSpecificBtn').on('click', function() {
+                const packType1 = $('#specificPackType1').val();
+                const targetRarity1 = parseInt($('#targetRarity1').val());
+                const packType2 = $('#specificPackType2').val();
+                const targetRarity2 = $('#targetRarity2').val() ? parseInt($('#targetRarity2').val()) : null;
+                const $chartContainer = $('#specificChartContainer');
+                const $progressBar = $chartContainer.find('.progress-bar');
+                const $stats2Container = $('#stats2ContainerSpecific');
+                
+                // Show loading state
+                $chartContainer.addClass('loading');
+                $chartContainer.attr('data-progress', 'Simulating... 0%');
+                $progressBar.css('width', '0%').attr('aria-valuenow', 0);
+                
+                setTimeout(() => {
+                    const results1 = [];
+                    const results2 = [];
+                    const totalTrials = 10000;
+                    const batchSize = 50;
+                    let processed = 0;
+
+                    function processBatch() {
+                        for (let i = 0; i < batchSize && processed < totalTrials; i++) {
+                            results1.push(simulateSpecificCard(packType1, targetRarity1));
+                            if (packType2 && targetRarity2 !== null) {
+                                results2.push(simulateSpecificCard(packType2, targetRarity2));
+                            }
+                            processed++;
+                        }
+
+                        // Update progress
+                        const progress = Math.round((processed / totalTrials) * 100);
+                        $chartContainer.attr('data-progress', `Simulating... ${progress}%`);
+                        $progressBar.css('width', `${progress}%`).attr('aria-valuenow', progress);
+
+                        if (processed < totalTrials) {
+                            setTimeout(processBatch, 0);
+                        } else {
+                            // Calculate statistics for rarity 1
+                            const sortedResults1 = [...results1].sort((a, b) => a - b);
+                            const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
+                            const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
+                            const min1 = Math.min(...results1);
+                            const max1 = Math.max(...results1);
+
+                            // Update rarity 1 statistics
+                            $('#avgPacksSpecific1').text(avg1);
+                            $('#medianPacksSpecific1').text(median1);
+                            $('#minPacksSpecific1').text(min1);
+                            $('#maxPacksSpecific1').text(max1);
+
+                            if (packType2 && targetRarity2 !== null) {
+                                // Calculate statistics for rarity 2
+                                const sortedResults2 = [...results2].sort((a, b) => a - b);
+                                const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
+                                const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
+                                const min2 = Math.min(...results2);
+                                const max2 = Math.max(...results2);
+
+                                // Update rarity 2 statistics
+                                $('#avgPacksSpecific2').text(avg2);
+                                $('#medianPacksSpecific2').text(median2);
+                                $('#minPacksSpecific2').text(min2);
+                                $('#maxPacksSpecific2').text(max2);
+                                $stats2Container.show();
+                            } else {
+                                $stats2Container.hide();
+                            }
+
+                            // Remove loading state and update chart
+                            $chartContainer.removeClass('loading');
+                            updateSpecificChart(results1, targetRarity1, targetRarity2 !== null ? results2 : null, targetRarity2);
+                        }
+                    }
+
+                    // Start processing batches
+                    processBatch();
+                }, 50);
+            });
         });
     </script>
 </body>
