@@ -172,7 +172,7 @@
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="doubleCollection">
                             <label class="form-check-label" for="doubleCollection">
-                                x2 for all cards (collect each variation twice)
+                                x2 for all cards (collect each cards twice)
                             </label>
                         </div>
 
@@ -279,6 +279,12 @@
                                 </div>
                             </div>
                             <div class="col-12">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="doubleSpecific">
+                                    <label class="form-check-label" for="doubleSpecific">
+                                        x2 for target cards (collect target card twice)
+                                    </label>
+                                </div>
                                 <button id="simulateSpecificBtn" class="btn btn-primary">Simulate</button>
                             </div>
                         </div>
@@ -707,6 +713,32 @@
             });
         }
 
+        function simulateSpecificCard(packType, targetRarity, needDouble = false) {
+            const cardCounts = PACK_CARD_COUNTS[packType];
+            // Randomly select which specific card number we want (1 to total cards of that rarity)
+            const targetCardNumber = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
+            let packCount = 0;
+            let copiesFound = 0;
+            const requiredCopies = needDouble ? 2 : 1;
+
+            while (copiesFound < requiredCopies) {
+                packCount++;
+                const isGodPack = Math.random() > PACK_RATES[0];
+                const result = simulatePackOpening(packType, isGodPack);
+                
+                if (result.counts[targetRarity] > 0) {
+                    // When we pull a card of the right rarity, we have 1/N chance of it being our target card
+                    // where N is the total number of different cards of that rarity
+                    const randomCard = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
+                    if (randomCard === targetCardNumber) {
+                        copiesFound++;
+                    }
+                }
+            }
+
+            return packCount;
+        }
+
         $(document).ready(function() {
             // Pack Simulator
             $('#simulateBtn').on('click', function() {
@@ -866,24 +898,25 @@
                 }, 50);
             });
 
-            function simulateSpecificCard(packType, targetRarity) {
+            function simulateSpecificCard(packType, targetRarity, needDouble = false) {
                 const cardCounts = PACK_CARD_COUNTS[packType];
                 // Randomly select which specific card number we want (1 to total cards of that rarity)
                 const targetCardNumber = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
                 let packCount = 0;
-                let found = false;
+                let copiesFound = 0;
+                const requiredCopies = needDouble ? 2 : 1;
 
-                while (!found) {
+                while (copiesFound < requiredCopies) {
                     packCount++;
                     const isGodPack = Math.random() > PACK_RATES[0];
-                    const packResults = simulatePackOpening(packType, isGodPack);
+                    const result = simulatePackOpening(packType, isGodPack);
                     
-                    if (packResults.counts[targetRarity] > 0) {
+                    if (result.counts[targetRarity] > 0) {
                         // When we pull a card of the right rarity, we have 1/N chance of it being our target card
                         // where N is the total number of different cards of that rarity
                         const randomCard = Math.floor(Math.random() * cardCounts[targetRarity]) + 1;
                         if (randomCard === targetCardNumber) {
-                            found = true;
+                            copiesFound++;
                         }
                     }
                 }
@@ -937,6 +970,7 @@
                 const targetRarity1 = parseInt($('#targetRarity1').val());
                 const packType2 = $('#specificPackType2').val();
                 const targetRarity2 = $('#targetRarity2').val() ? parseInt($('#targetRarity2').val()) : null;
+                const needDouble = $('#doubleSpecific').is(':checked');
                 const $chartContainer = $('#specificChartContainer');
                 const $progressBar = $chartContainer.find('.progress-bar');
                 const $stats2Container = $('#stats2ContainerSpecific');
@@ -955,9 +989,9 @@
 
                     function processBatch() {
                         for (let i = 0; i < batchSize && processed < totalTrials; i++) {
-                            results1.push(simulateSpecificCard(packType1, targetRarity1));
+                            results1.push(simulateSpecificCard(packType1, targetRarity1, needDouble));
                             if (packType2 && targetRarity2 !== null) {
-                                results2.push(simulateSpecificCard(packType2, targetRarity2));
+                                results2.push(simulateSpecificCard(packType2, targetRarity2, needDouble));
                             }
                             processed++;
                         }
