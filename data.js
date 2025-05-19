@@ -15,6 +15,9 @@ export const PACK_CARD_COUNTS = {
   a2a: [31, 26, 13, 5, 6, 13, 1, 1, 0, 0], // a2a
 
   a2b: [32, 22, 9, 9, 6, 17, 1, 1, 10, 4], // a2b
+
+  a3_solgaleo: [43, 34, 14, 5, 12, 14, 1, 1, 10, 4],
+  a3_lunala: [43, 34, 14, 5, 12, 14, 1, 1, 10, 4], 
 };
 
 export const DRAW_RATES = {
