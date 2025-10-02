@@ -17,7 +17,7 @@ export function initializeEvolveSimulator() {
           const basicCount = parseInt($('input[name="basicCount"]:checked').val());
           const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
           const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
-    const cyrusCount = parseInt($('input[name="cyrusCount"]:checked').val());
+    const cyrusCount = 0; // Cyrus removed from options
     const professorCount = parseInt($('input[name="professorCount"]:checked').val());
     const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
     const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());

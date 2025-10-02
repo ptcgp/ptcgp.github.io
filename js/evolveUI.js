@@ -5,7 +5,7 @@ export function updateDeckComposition() {
   const basicCount = parseInt($('input[name="basicCount"]:checked').val());
   const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
   const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
-  const cyrusCount = parseInt($('input[name="cyrusCount"]:checked').val());
+  const cyrusCount = 0; // Cyrus removed from options
   const professorCount = parseInt($('input[name="professorCount"]:checked').val());
   const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
   const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount;
@@ -36,12 +36,6 @@ export function updateDeckComposition() {
             <div class="text-center">
               <div class="h4 text-warning mb-1">${stage2Count}</div>
               <div class="small text-muted">Stage 2 Pokemon</div>
-            </div>
-          </div>
-          <div class="col-md-2 col-6">
-            <div class="text-center">
-              <div class="h4 text-danger mb-1">${cyrusCount}</div>
-              <div class="small text-muted">Cyrus</div>
             </div>
           </div>
           <div class="col-md-2 col-6">
