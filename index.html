@@ -728,6 +728,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-2 col-6">
+                                        <div class="text-center">
+                                            <label class="form-label fw-bold text-dark">Poké Ball</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_0" value="0" checked>
+                                                <label class="btn btn-outline-dark" for="pokeball_0">0</label>
+                                                
+                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_1" value="1">
+                                                <label class="btn btn-outline-dark" for="pokeball_1">1</label>
+                                                
+                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_2" value="2">
+                                                <label class="btn btn-outline-dark" for="pokeball_2">2</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <hr class="my-4">
@@ -745,11 +760,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-secondary">Simulation Runs</label>
                                             <div class="d-flex justify-content-center">
                                                 <input type="number" id="simulationRuns" class="form-control form-control-lg text-center" min="100" max="100000" value="1000" style="max-width: 150px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="text-center">
+                                            <label class="form-label fw-bold text-secondary">Debug</label>
+                                            <div class="form-check d-flex justify-content-center">
+                                                <input class="form-check-input" type="checkbox" id="debugMode" style="transform: scale(1.5);">
                                             </div>
                                         </div>
                                     </div>
@@ -811,6 +834,23 @@
 
                         <div class="results-section">
                             <h2 class="h4 mb-4">Evolution Probability Results</h2>
+                            
+                            <!-- Debug Output Area -->
+                            <div id="debugOutput" class="mb-4" style="display: none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-bug me-2"></i>Debug Mode - Step-by-Step Simulation
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="debugSteps" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9em;">
+                                            <!-- Debug output will be inserted here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div id="evolveChartContainer" style="height: 500px;">
                                 <div class="progress">
                                     <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
