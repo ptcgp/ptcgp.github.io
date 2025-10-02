@@ -53,9 +53,11 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   
   // Track when we first get a Stage 2 Pokemon
   let firstStage2Turn = -1;
+  let basicPlayedThisTurn = false;
   
   while (stage2Pokemon < targetStage2Count) {
     turns++;
+    basicPlayedThisTurn = false;
     
     // Each turn: Draw 1 card at the beginning
     if (deck.length > 0) {
@@ -68,30 +70,33 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       // Put Basic into field
       field.push(basicInHand);
       hand = hand.filter(card => card !== basicInHand);
+      basicPlayedThisTurn = true;
     }
     
     // Check for evolution cards in hand
     const stage1InHand = hand.find(card => card.type === 'stage1');
     const stage2InHand = hand.find(card => card.type === 'stage2');
     
-    // Each turn: can evolve maximum 1 time
-    if (stage1InHand && field.some(pokemon => pokemon.type === 'basic')) {
-      // Evolve Basic to Stage 1
-      const basicInField = field.find(pokemon => pokemon.type === 'basic');
-      const basicIndex = field.indexOf(basicInField);
-      field[basicIndex] = stage1InHand;
-      hand = hand.filter(card => card !== stage1InHand);
-    } else if (stage2InHand && field.some(pokemon => pokemon.type === 'stage1')) {
-      // Evolve Stage 1 to Stage 2
-      const stage1InField = field.find(pokemon => pokemon.type === 'stage1');
-      const stage1Index = field.indexOf(stage1InField);
-      field[stage1Index] = stage2InHand;
-      hand = hand.filter(card => card !== stage2InHand);
-      stage2Pokemon++;
-      
-      // Record when we first get a Stage 2 Pokemon
-      if (firstStage2Turn === -1) {
-        firstStage2Turn = turns;
+    // Each turn: can evolve maximum 1 time, but NOT if Basic was played this turn
+    if (!basicPlayedThisTurn) {
+      if (stage1InHand && field.some(pokemon => pokemon.type === 'basic')) {
+        // Evolve Basic to Stage 1
+        const basicInField = field.find(pokemon => pokemon.type === 'basic');
+        const basicIndex = field.indexOf(basicInField);
+        field[basicIndex] = stage1InHand;
+        hand = hand.filter(card => card !== stage1InHand);
+      } else if (stage2InHand && field.some(pokemon => pokemon.type === 'stage1')) {
+        // Evolve Stage 1 to Stage 2
+        const stage1InField = field.find(pokemon => pokemon.type === 'stage1');
+        const stage1Index = field.indexOf(stage1InField);
+        field[stage1Index] = stage2InHand;
+        hand = hand.filter(card => card !== stage2InHand);
+        stage2Pokemon++;
+        
+        // Record when we first get a Stage 2 Pokemon
+        if (firstStage2Turn === -1) {
+          firstStage2Turn = turns;
+        }
       }
     }
     
@@ -492,6 +497,34 @@ function createComparisonLayout(currentResults, previousResults) {
       </div>
     </div>
     
+    <!-- Evolution Charts Comparison -->
+    <div class="row mt-3">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-bar me-2"></i>Previous Simulation Chart
+            </h6>
+          </div>
+          <div class="card-body">
+            <canvas id="previousChart" style="height: 300px;"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-line me-2"></i>Current Simulation Chart
+            </h6>
+          </div>
+          <div class="card-body">
+            <canvas id="currentChart" style="height: 300px;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- Turn-by-Turn Comparison -->
     <div class="row mt-3">
       <div class="col-12">
@@ -561,6 +594,11 @@ function createComparisonLayout(currentResults, previousResults) {
       </div>
     </div>
   `);
+  
+  // Create charts after HTML is generated
+  setTimeout(() => {
+    createComparisonCharts(previousResults, currentResults);
+  }, 100);
 }
 
 // Helper function to generate turn comparison table
@@ -626,4 +664,109 @@ function calculateMedianTurns(results) {
   return sorted.length % 2 === 0 
     ? ((sorted[mid - 1] + sorted[mid]) / 2).toFixed(1)
     : sorted[mid].toFixed(1);
+}
+
+// Function to create comparison charts
+function createComparisonCharts(previousResults, currentResults) {
+  try {
+    // Destroy any existing chart instances first
+    if (window.previousChartInstance) {
+      window.previousChartInstance.destroy();
+      window.previousChartInstance = null;
+    }
+    if (window.currentChartInstance) {
+      window.currentChartInstance.destroy();
+      window.currentChartInstance = null;
+    }
+    
+    // Create previous chart
+    const prevCanvas = document.getElementById('previousChart');
+    if (prevCanvas && prevCanvas.tagName === 'CANVAS') {
+      const prevCtx = prevCanvas.getContext('2d');
+      window.previousChartInstance = new Chart(prevCtx, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: Math.min(20, previousResults.results.length)}, (_, i) => `Turn ${i + 1}`),
+          datasets: [{
+            label: 'Evolution Frequency',
+            data: previousResults.results.slice(0, 20),
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { 
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Frequency'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Turn Number'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `Previous: ${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count} (${previousResults.successRate}%)`
+            }
+          }
+        }
+      });
+    }
+    
+    // Create current chart
+    const currCanvas = document.getElementById('currentChart');
+    if (currCanvas && currCanvas.tagName === 'CANVAS') {
+      const currCtx = currCanvas.getContext('2d');
+      window.currentChartInstance = new Chart(currCtx, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: Math.min(20, currentResults.results.length)}, (_, i) => `Turn ${i + 1}`),
+          datasets: [{
+            label: 'Evolution Frequency',
+            data: currentResults.results.slice(0, 20),
+            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { 
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Frequency'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Turn Number'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `Current: ${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count} (${currentResults.successRate}%)`
+            }
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error creating comparison charts:', error);
+  }
 }
