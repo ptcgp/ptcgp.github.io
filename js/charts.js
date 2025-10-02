@@ -248,3 +248,84 @@ export function updateSpecificChart(data1, rarity1, results2 = null, rarity2 = n
     }
   });
 }
+export function updateEvolveChart(results, turnProbabilities, cumulativeProbabilities) {
+  const ctx = document.getElementById('evolveChart').getContext('2d');
+  
+  // Destroy existing chart if it exists
+  if (window.evolveChartInstance) {
+    window.evolveChartInstance.destroy();
+  }
+  
+  // Create histogram data
+  const maxTurns = Math.max(...results);
+  const histogramData = [];
+  const labels = [];
+  
+  for (let i = 1; i <= Math.min(maxTurns, 20); i++) {
+    labels.push(`Turn ${i}`);
+    histogramData.push(results.filter(turns => turns === i).length);
+  }
+  
+  window.evolveChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Frequency',
+          data: histogramData,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Cumulative Probability (%)',
+          data: cumulativeProbabilities,
+          type: 'line',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 2,
+          fill: false,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Evolution Turn Distribution and Cumulative Probability'
+        },
+        legend: {
+          display: true
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Frequency'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Cumulative Probability (%)'
+          },
+          grid: {
+            drawOnChartArea: false,
+          },
+        }
+      }
+    }
+  });
+}

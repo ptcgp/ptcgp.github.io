@@ -13,7 +13,8 @@ function populatePackTypeDropdowns() {
     'collectionPackType1', 
     'collectionPackType2',
     'specificPackType1',
-    'specificPackType2'
+    'specificPackType2',
+    'evolvePackType'
   ];
 
   dropdownIds.forEach(dropdownId => {

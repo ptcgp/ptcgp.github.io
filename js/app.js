@@ -1,4 +1,5 @@
-import { initializePackSimulator, initializeCollectionSimulator, initializeSpecificCardSimulator, initializeGoldCalculator } from './ui.js';
+import { initializeEvolveSimulator } from './evolveSimulator.js';
+import { initializeCollectionSimulator, initializeGoldCalculator, initializePackSimulator, initializeSpecificCardSimulator } from './ui.js';
 import { validateDrawRates } from './validation.js';
 
 $(document).ready(function() {
@@ -17,4 +18,5 @@ $(document).ready(function() {
   initializeCollectionSimulator();
   initializeSpecificCardSimulator();
   initializeGoldCalculator();
+  initializeEvolveSimulator();
 });
