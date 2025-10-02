@@ -650,8 +650,9 @@
                                 <h5 class="card-title mb-0">Deck Configuration</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-2 col-6">
+                                <!-- Row 1: Pokemon Cards -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4 col-6">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-primary">Basic Pokemon</label>
                                             <div class="btn-group w-100" role="group">
@@ -667,7 +668,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-2 col-6">
+                                    <div class="col-md-4 col-6">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-success">Stage 1 Pokemon</label>
                                             <div class="btn-group w-100" role="group">
@@ -683,7 +684,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-2 col-6">
+                                    <div class="col-md-4 col-6">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-warning">Stage 2 Pokemon</label>
                                             <div class="btn-group w-100" role="group">
@@ -698,7 +699,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-6">
+                                </div>
+                                
+                                <!-- Row 2: Supporter and Item Cards -->
+                                <div class="row g-3">
+                                    <div class="col-md-4 col-6">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-info">Professor's Research</label>
                                             <div class="btn-group w-100" role="group">
@@ -713,18 +718,33 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-6">
+                                    <div class="col-md-4 col-6">
                                         <div class="text-center">
                                             <label class="form-label fw-bold text-dark">Poké Ball</label>
                                             <div class="btn-group w-100" role="group">
-                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_0" value="0" checked>
+                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_0" value="0">
                                                 <label class="btn btn-outline-dark" for="pokeball_0">0</label>
                                                 
                                                 <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_1" value="1">
                                                 <label class="btn btn-outline-dark" for="pokeball_1">1</label>
                                                 
-                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_2" value="2">
+                                                <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_2" value="2" checked>
                                                 <label class="btn btn-outline-dark" for="pokeball_2">2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6">
+                                        <div class="text-center">
+                                            <label class="form-label fw-bold text-success">Rare Candy</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_0" value="0">
+                                                <label class="btn btn-outline-success" for="rarecandy_0">0</label>
+                                                
+                                                <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_1" value="1">
+                                                <label class="btn btn-outline-success" for="rarecandy_1">1</label>
+                                                
+                                                <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_2" value="2" checked>
+                                                <label class="btn btn-outline-success" for="rarecandy_2">2</label>
                                             </div>
                                         </div>
                                     </div>

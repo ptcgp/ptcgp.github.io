@@ -1,5 +1,5 @@
 // Core simulation logic for Pokemon evolution
-export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, targetStage2Count, debugMode = false) {
+export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, targetStage2Count, debugMode = false) {
   // Create a deck of 20 cards with each card type appearing max twice
   const deck = [];
   
@@ -18,10 +18,7 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     deck.push({ type: 'stage2', name: `Stage 2 ${i + 1}` });
   }
   
-  // Add Cyrus cards
-  for (let i = 0; i < cyrusCount; i++) {
-    deck.push({ type: 'cyrus', name: 'Cyrus' });
-  }
+  // Cyrus removed from options
   
   // Add Professor's Research cards
   for (let i = 0; i < professorCount; i++) {
@@ -31,6 +28,11 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   // Add Poké Ball cards
   for (let i = 0; i < pokeballCount; i++) {
     deck.push({ type: 'pokeball', name: 'Poké Ball' });
+  }
+  
+  // Add Rare Candy cards
+  for (let i = 0; i < rareCandyCount; i++) {
+    deck.push({ type: 'rarecandy', name: 'Rare Candy' });
   }
   
   // Fill remaining slots with other cards (energy, trainers, etc.)
@@ -148,18 +150,46 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       }
     }
     
-    // Each turn: can play 1 Supporter card (Cyrus or Professor's Research)
-    const cyrusInHand = hand.find(card => card.type === 'cyrus');
+    // Each turn: can play multiple Item cards (Rare Candy) - Use strategically
+    let rareCandiesInHand = hand.filter(card => card.type === 'rarecandy');
+    
+    if (debugMode) {
+      console.log('Rare Candies in hand:', rareCandiesInHand.length);
+    }
+    
+    // Use Rare Candy if we have Basic Pokemon in field and Stage 2 in hand
+    // This allows direct Basic -> Stage 2 evolution
+    if (rareCandiesInHand.length > 0 && field.some(pokemon => pokemon.type === 'basic') && hand.some(card => card.type === 'stage2')) {
+      for (const rareCandy of rareCandiesInHand) {
+        hand = hand.filter(card => card !== rareCandy);
+        // Rare Candy: Evolve Basic directly to Stage 2
+        const basicInField = field.find(pokemon => pokemon.type === 'basic');
+        const stage2InHand = hand.find(card => card.type === 'stage2');
+        if (basicInField && stage2InHand) {
+          const basicIndex = field.indexOf(basicInField);
+          field[basicIndex] = stage2InHand;
+          hand = hand.filter(card => card !== stage2InHand);
+          stage2Pokemon++;
+          
+          if (debugMode) {
+            console.log('Rare Candy evolved Basic to Stage 2');
+          }
+          
+          // Record when we first get a Stage 2 Pokemon
+          if (firstStage2Turn === -1) {
+            firstStage2Turn = turns;
+            if (debugMode) {
+              console.log(`SUCCESS! Stage 2 evolution on turn ${turns} via Rare Candy`);
+            }
+          }
+        }
+      }
+    }
+    
+    // Each turn: can play 1 Supporter card (Professor's Research)
     const professorInHand = hand.find(card => card.type === 'professor');
     
-    if (cyrusInHand) {
-      // Play Cyrus
-      hand = hand.filter(card => card !== cyrusInHand);
-      supporterPlayedThisTurn = true;
-      if (debugMode) {
-        console.log('Played Cyrus');
-      }
-    } else if (professorInHand) {
+    if (professorInHand) {
       // Play Professor's Research - Draw 2 cards
       hand = hand.filter(card => card !== professorInHand);
       supporterPlayedThisTurn = true;
@@ -214,10 +244,15 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     // 3. We don't have a Stage 1 in field that can be evolved to Stage 2
     // 4. We don't have a Basic in field that can be evolved to Stage 1
     // 5. We don't already have a Basic in field (hold Basics in hand for future use)
+    // 6. We don't have Rare Candy + Stage 2 combo available (prioritize Rare Candy over playing Basic)
     const hasBasicInField = field.some(pokemon => pokemon.type === 'basic');
     const stage1InHand = hand.find(card => card.type === 'stage1');
+    const stage2InHandForRareCandy = hand.find(card => card.type === 'stage2');
     
-    if (basicsInHand.length > 0 && field.length < 4 && !hasBasicInField && !(hasStage1InField && stage2InHand) && !(hasBasicInField && stage1InHand)) {
+    // Don't play Basic if we can use Rare Candy to evolve existing Basic to Stage 2
+    const canUseRareCandy = rareCandiesInHand.length > 0 && hasBasicInField && stage2InHandForRareCandy;
+    
+    if (basicsInHand.length > 0 && field.length < 4 && !hasBasicInField && !(hasStage1InField && stage2InHand) && !(hasBasicInField && stage1InHand) && !canUseRareCandy) {
       // Put Basic Pokemon into field (up to 4 total)
       const basicToPlay = basicsInHand[0]; // Play one Basic Pokemon
       field.push(basicToPlay);
@@ -241,6 +276,8 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       console.log('Basic played this turn:', basicPlayedThisTurn);
       console.log('Turns > 1:', turns > 1);
       console.log('Can evolve:', !basicPlayedThisTurn && turns > 1);
+      console.log('Rare Candies in hand:', rareCandiesInHand.length);
+      console.log('Can use Rare Candy:', canUseRareCandy);
     }
     
     if (!basicPlayedThisTurn && turns > 1) {

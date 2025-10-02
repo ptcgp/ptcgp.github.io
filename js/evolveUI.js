@@ -8,7 +8,8 @@ export function updateDeckComposition() {
   const cyrusCount = 0; // Cyrus removed from options
   const professorCount = parseInt($('input[name="professorCount"]:checked').val());
   const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
-  const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount;
+  const rareCandyCount = parseInt($('input[name="rareCandyCount"]:checked').val());
+  const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount + rareCandyCount;
   const remainingCards = 20 - totalCards;
   
   $('#deckComposition').html(`
@@ -52,6 +53,12 @@ export function updateDeckComposition() {
           </div>
           <div class="col-md-2 col-6">
             <div class="text-center">
+              <div class="h4 text-success mb-1">${rareCandyCount}</div>
+              <div class="small text-muted">Rare Candy</div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="text-center">
               <div class="h4 text-secondary mb-1">${remainingCards}</div>
               <div class="small text-muted">Other Cards</div>
             </div>
@@ -69,7 +76,7 @@ export function updateDeckComposition() {
 // Initialize UI event handlers
 export function initializeEvolveUI() {
   // Update deck composition on input changes
-  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"], input[name="cyrusCount"], input[name="professorCount"], input[name="pokeballCount"]').on('change', updateDeckComposition);
+  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"], input[name="professorCount"], input[name="pokeballCount"], input[name="rareCandyCount"]').on('change', updateDeckComposition);
   updateDeckComposition(); // Initial update
 
   // Preset configurations

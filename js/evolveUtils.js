@@ -2,9 +2,10 @@
 
 // Helper function to get supporter card information
 export function getSupporterInfo(config) {
-  const cyrusCount = config.cyrusCount || 0;
+  const cyrusCount = 0; // Cyrus removed from options
   const professorCount = config.professorCount || 0;
   const pokeballCount = config.pokeballCount || 0;
+  const rareCandyCount = config.rareCandyCount || 0;
   
   let supporterText = '';
   const parts = [];
@@ -12,6 +13,7 @@ export function getSupporterInfo(config) {
   if (cyrusCount > 0) parts.push(`Cyrus: ${cyrusCount}`);
   if (professorCount > 0) parts.push(`Professor: ${professorCount}`);
   if (pokeballCount > 0) parts.push(`Poké Ball: ${pokeballCount}`);
+  if (rareCandyCount > 0) parts.push(`Rare Candy: ${rareCandyCount}`);
   
   if (parts.length > 0) {
     supporterText = parts.join(', ');
