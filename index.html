@@ -71,13 +71,13 @@
                     <!-- Pack Simulator Tab -->
                     <div class="tab-pane fade show active" id="pack" role="tabpanel">
                         <div class="row g-3 align-items-end mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="packType" class="form-label">Pack Type 1</label>
                                 <select id="packType" class="form-select">
                                     <!-- Options populated dynamically -->
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="packType2" class="form-label">Pack Type 2 (Optional)</label>
                                 <select id="packType2" class="form-select">
                                     <option value="">None</option>
@@ -85,8 +85,12 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label for="packCount" class="form-label">Number of Packs</label>
-                                <input type="number" id="packCount" class="form-control" min="1" max="100000" value="10000">
+                                <label for="packCount" class="form-label">Packs per Run</label>
+                                <input type="number" id="packCount" class="form-control" min="1" max="100000" value="1000">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="runCount" class="form-label">Number of Runs</label>
+                                <input type="number" id="runCount" class="form-control" min="1" max="1000" value="1">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">&nbsp;</label>
@@ -151,6 +155,47 @@
                                                 </tr>
                                             </tfoot>
                                         </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Multi-Run Statistics -->
+                            <div class="mt-4" id="multiRunStats" style="display: none;">
+                                <h3 class="h5 mb-3">Multi-Run Statistics</h3>
+                                <div class="row" id="multiRunStatsContainer">
+                                    <div class="col-md-6" id="multiRunStats1">
+                                        <h4 class="h6">Pack Type 1 - Rarity Distribution Across All Runs</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Rarity</th>
+                                                        <th>Avg per Run</th>
+                                                        <th>Min per Run</th>
+                                                        <th>Max per Run</th>
+                                                        <th>Std Dev</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="multiRunTable1"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" id="multiRunStats2" style="display: none;">
+                                        <h4 class="h6">Pack Type 2 - Rarity Distribution Across All Runs</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Rarity</th>
+                                                        <th>Avg per Run</th>
+                                                        <th>Min per Run</th>
+                                                        <th>Max per Run</th>
+                                                        <th>Std Dev</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="multiRunTable2"></tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

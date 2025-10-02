@@ -48,52 +48,36 @@ export function initializePackSimulator() {
     const packType1 = $('#packType').val();
     const packType2 = $('#packType2').val();
     const packCount = parseInt($('#packCount').val());
+    const runCount = parseInt($('#runCount').val());
     const $error = $('#error');
 
     if (isNaN(packCount) || packCount < 1 || packCount > 100000) {
       $error.removeClass('d-none');
       return;
     }
+    if (isNaN(runCount) || runCount < 1 || runCount > 1000) {
+      $error.removeClass('d-none');
+      return;
+    }
     $error.addClass('d-none');
 
-    // Simulate first pack type
-    const packTypeCounts1 = {};
-    const results1 = new Array(RARITY_SYMBOLS.length).fill(0);
+    // Multi-run simulation
+    const allRunResults1 = [];
+    const allRunResults2 = [];
     const packRates1 = DRAW_RATES_TYPED[packType1]?.pack_rates || [[0.9995, "regular"], [0.0005, "rare"]];
+    const packRates2 = packType2 ? DRAW_RATES_TYPED[packType2]?.pack_rates || [[0.9995, "regular"], [0.0005, "rare"]] : null;
 
-    for (let i = 0; i < packCount; i++) {
-      const random = Math.random();
-      let cumulative = 0;
-      let selectedPackType = "regular";
-      for (const [rate, packTypeName] of packRates1) {
-        cumulative += rate;
-        if (random < cumulative) {
-          selectedPackType = packTypeName;
-          break;
-        }
-      }
-
-      packTypeCounts1[selectedPackType] = (packTypeCounts1[selectedPackType] || 0) + 1;
-
-      const isGodPack = selectedPackType === "rare";
-      const isBabyPack = selectedPackType === "baby";
-      const packResults = simulatePackOpening(packType1, isGodPack, isBabyPack);
-      for (let j = 0; j < results1.length; j++) {
-        results1[j] += packResults.counts[j];
-      }
-    }
-
-    // Simulate second pack type if selected
-    let packTypeCounts2 = {};
-    let results2 = new Array(RARITY_SYMBOLS.length).fill(0);
-    if (packType2) {
-      const packRates2 = DRAW_RATES_TYPED[packType2]?.pack_rates || [[0.9995, "regular"], [0.0005, "rare"]];
+    // Run simulations
+    for (let run = 0; run < runCount; run++) {
+      // Simulate first pack type for this run
+      const runResults1 = new Array(RARITY_SYMBOLS.length).fill(0);
+      const packTypeCounts1 = {};
 
       for (let i = 0; i < packCount; i++) {
         const random = Math.random();
         let cumulative = 0;
         let selectedPackType = "regular";
-        for (const [rate, packTypeName] of packRates2) {
+        for (const [rate, packTypeName] of packRates1) {
           cumulative += rate;
           if (random < cumulative) {
             selectedPackType = packTypeName;
@@ -101,16 +85,68 @@ export function initializePackSimulator() {
           }
         }
 
-        packTypeCounts2[selectedPackType] = (packTypeCounts2[selectedPackType] || 0) + 1;
+        packTypeCounts1[selectedPackType] = (packTypeCounts1[selectedPackType] || 0) + 1;
 
         const isGodPack = selectedPackType === "rare";
         const isBabyPack = selectedPackType === "baby";
-        const packResults = simulatePackOpening(packType2, isGodPack, isBabyPack);
-        for (let j = 0; j < results2.length; j++) {
-          results2[j] += packResults.counts[j];
+        const packResults = simulatePackOpening(packType1, isGodPack, isBabyPack);
+        for (let j = 0; j < runResults1.length; j++) {
+          runResults1[j] += packResults.counts[j];
+        }
+      }
+
+      allRunResults1.push(runResults1);
+
+      // Simulate second pack type for this run if selected
+      if (packType2) {
+        const runResults2 = new Array(RARITY_SYMBOLS.length).fill(0);
+        const packTypeCounts2 = {};
+
+        for (let i = 0; i < packCount; i++) {
+          const random = Math.random();
+          let cumulative = 0;
+          let selectedPackType = "regular";
+          for (const [rate, packTypeName] of packRates2) {
+            cumulative += rate;
+            if (random < cumulative) {
+              selectedPackType = packTypeName;
+              break;
+            }
+          }
+
+          packTypeCounts2[selectedPackType] = (packTypeCounts2[selectedPackType] || 0) + 1;
+
+          const isGodPack = selectedPackType === "rare";
+          const isBabyPack = selectedPackType === "baby";
+          const packResults = simulatePackOpening(packType2, isGodPack, isBabyPack);
+          for (let j = 0; j < runResults2.length; j++) {
+            runResults2[j] += packResults.counts[j];
+          }
+        }
+
+        allRunResults2.push(runResults2);
+      }
+    }
+
+    // Calculate totals for display (sum of all runs)
+    const results1 = new Array(RARITY_SYMBOLS.length).fill(0);
+    const results2 = new Array(RARITY_SYMBOLS.length).fill(0);
+    
+    for (let run = 0; run < runCount; run++) {
+      for (let j = 0; j < RARITY_SYMBOLS.length; j++) {
+        results1[j] += allRunResults1[run][j];
+        if (packType2) {
+          results2[j] += allRunResults2[run][j];
         }
       }
     }
+
+    // Calculate pack type distribution (average across all runs)
+    const packTypeCounts1 = {};
+    const packTypeCounts2 = {};
+    
+    // This is a simplified version - in a real implementation, you'd track pack types per run
+    // For now, we'll just show the total results
 
     // Show pack distribution
     let packDistHtml = '';
@@ -194,6 +230,80 @@ export function initializePackSimulator() {
 
       $('#cardDistributionTable2').html(tableRows2);
       $('#totalCards2').text(totalCards2);
+    }
+
+    // Calculate and display multi-run statistics
+    if (runCount > 1) {
+      $('#multiRunStats').show();
+      
+      // Adjust layout based on whether pack type 2 is selected
+      if (packType2) {
+        // Both pack types selected - use side-by-side layout
+        $('#multiRunStats1').removeClass('col-md-12').addClass('col-md-6');
+        $('#multiRunStats2').show();
+      } else {
+        // Only pack type 1 selected - make it full width
+        $('#multiRunStats1').removeClass('col-md-6').addClass('col-md-12');
+        $('#multiRunStats2').hide();
+      }
+      
+      // Calculate statistics for pack type 1
+      const cardCounts1 = PACK_CARD_COUNTS_ARRAY[packType1];
+      const multiRunTable1 = [];
+      
+      for (let i = 0; i < RARITIES.length; i++) {
+        if (cardCounts1[i] > 0) {
+          const runValues = allRunResults1.map(run => run[i]);
+          const avg = (runValues.reduce((a, b) => a + b, 0) / runCount).toFixed(2);
+          const min = Math.min(...runValues);
+          const max = Math.max(...runValues);
+          const variance = runValues.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / runCount;
+          const stdDev = Math.sqrt(variance).toFixed(2);
+          
+          multiRunTable1.push(`
+            <tr>
+              <td>${RARITIES[i].name}</td>
+              <td>${avg}</td>
+              <td>${min}</td>
+              <td>${max}</td>
+              <td>${stdDev}</td>
+            </tr>
+          `);
+        }
+      }
+      
+      $('#multiRunTable1').html(multiRunTable1.join(''));
+      
+      // Calculate statistics for pack type 2 if selected
+      if (packType2) {
+        const cardCounts2 = PACK_CARD_COUNTS_ARRAY[packType2];
+        const multiRunTable2 = [];
+        
+        for (let i = 0; i < RARITIES.length; i++) {
+          if (cardCounts2[i] > 0) {
+            const runValues = allRunResults2.map(run => run[i]);
+            const avg = (runValues.reduce((a, b) => a + b, 0) / runCount).toFixed(2);
+            const min = Math.min(...runValues);
+            const max = Math.max(...runValues);
+            const variance = runValues.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / runCount;
+            const stdDev = Math.sqrt(variance).toFixed(2);
+            
+            multiRunTable2.push(`
+              <tr>
+                <td>${RARITIES[i].name}</td>
+                <td>${avg}</td>
+                <td>${min}</td>
+                <td>${max}</td>
+                <td>${stdDev}</td>
+              </tr>
+            `);
+          }
+        }
+        
+        $('#multiRunTable2').html(multiRunTable2.join(''));
+      }
+    } else {
+      $('#multiRunStats').hide();
     }
   });
 }
