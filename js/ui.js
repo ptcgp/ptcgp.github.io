@@ -142,33 +142,6 @@ export function initializePackSimulator() {
       }
     }
 
-    // Calculate pack type distribution (average across all runs)
-    const packTypeCounts1 = {};
-    const packTypeCounts2 = {};
-    
-    // This is a simplified version - in a real implementation, you'd track pack types per run
-    // For now, we'll just show the total results
-
-    // Show pack distribution
-    let packDistHtml = '';
-    for (const [packTypeName, count] of Object.entries(packTypeCounts1)) {
-      const percentage = ((count / packCount) * 100).toFixed(2);
-      let displayName;
-      if (packTypeName === "rare") {
-        displayName = "God Packs";
-      } else if (packTypeName === "baby") {
-        displayName = "Baby Packs";
-      } else {
-        displayName = packTypeName.charAt(0).toUpperCase() + packTypeName.slice(1) + ' Packs';
-      }
-      packDistHtml += `
-        <div class="result-item d-flex justify-content-between">
-          <span>${displayName}:</span>
-          <span>${count} (${percentage}%)</span>
-        </div>
-      `;
-    }
-    $('#packResults').html(packDistHtml);
 
     // Show/hide second pack results and adjust column widths
     if (packType2) {
