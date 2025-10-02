@@ -283,9 +283,56 @@ export function initializePackSimulator() {
         }
         
         $('#multiRunTable2').html(multiRunTable2.join(''));
+        
+        // Show rate comparison if both pack types are selected
+        $('#rateComparison').show();
+        
+        // Calculate comparison statistics
+        const comparisonTable = [];
+        for (let i = 0; i < RARITY_SYMBOLS.length; i++) {
+          if (cardCounts1[i] > 0 || cardCounts2[i] > 0) {
+            // Get average values for both pack types
+            const runValues1 = allRunResults1.map(run => run[i]);
+            const runValues2 = allRunResults2.map(run => run[i]);
+            const avg1 = (runValues1.reduce((sum, val) => sum + val, 0) / runCount).toFixed(2);
+            const avg2 = (runValues2.reduce((sum, val) => sum + val, 0) / runCount).toFixed(2);
+            
+            // Calculate difference and percentage change
+            const diff = (parseFloat(avg2) - parseFloat(avg1)).toFixed(2);
+            const percentChange = parseFloat(avg1) > 0 ? 
+              (((parseFloat(avg2) - parseFloat(avg1)) / parseFloat(avg1)) * 100).toFixed(1) : 
+              (parseFloat(avg2) > 0 ? '100.0' : '0.0');
+            
+            // Determine color class for difference
+            let diffClass = '';
+            let changeClass = '';
+            if (parseFloat(diff) > 0) {
+              diffClass = 'text-success';
+              changeClass = 'text-success';
+            } else if (parseFloat(diff) < 0) {
+              diffClass = 'text-danger';
+              changeClass = 'text-danger';
+            }
+            
+            comparisonTable.push(`
+              <tr>
+                <td class="text-start fw-bold">${RARITIES[i].name}</td>
+                <td class="text-end font-monospace">${avg1}</td>
+                <td class="text-end font-monospace">${avg2}</td>
+                <td class="text-end font-monospace ${diffClass}">${diff > 0 ? '+' : ''}${diff}</td>
+                <td class="text-end font-monospace ${changeClass}">${percentChange > 0 ? '+' : ''}${percentChange}%</td>
+              </tr>
+            `);
+          }
+        }
+        
+        $('#rateComparisonTable').html(comparisonTable.join(''));
+      } else {
+        $('#rateComparison').hide();
       }
     } else {
       $('#multiRunStats').hide();
+      $('#rateComparison').hide();
     }
   });
 }
