@@ -80,45 +80,37 @@ export function initializeEvolveUI() {
   updateDeckComposition(); // Initial update
 
   // Preset configurations
+  // Format: Basic-Stage1-Stage2-Professor-Pokeball-RareCandy
   $('#presetBalanced').on('click', function() {
+    // Full Support (2-2-2-2-2-2)
     $('#basic2').prop('checked', true);
     $('#stage1_2').prop('checked', true);
-    $('#stage2_1').prop('checked', true);
+    $('#stage2_2').prop('checked', true);
+    $('#professor_2').prop('checked', true);
+    $('#pokeball_2').prop('checked', true);
+    $('#rarecandy_2').prop('checked', true);
     updateDeckComposition();
   });
 
   $('#presetHeavy').on('click', function() {
-    $('#basic1').prop('checked', true);
-    $('#stage1_2').prop('checked', true);
+    // No Stage 1 (2-0-2-2-2-2)
+    $('#basic2').prop('checked', true);
+    $('#stage1_0').prop('checked', true);
     $('#stage2_2').prop('checked', true);
+    $('#professor_2').prop('checked', true);
+    $('#pokeball_2').prop('checked', true);
+    $('#rarecandy_2').prop('checked', true);
     updateDeckComposition();
   });
 
   $('#presetLight').on('click', function() {
+    // Min Stage 1 (2-1-2-2-2-2)
     $('#basic2').prop('checked', true);
     $('#stage1_1').prop('checked', true);
-    $('#stage2_1').prop('checked', true);
-    updateDeckComposition();
-  });
-
-  $('#presetMax').on('click', function() {
-    $('#basic2').prop('checked', true);
-    $('#stage1_2').prop('checked', true);
     $('#stage2_2').prop('checked', true);
-    updateDeckComposition();
-  });
-
-  $('#presetMinimal').on('click', function() {
-    $('#basic1').prop('checked', true);
-    $('#stage1_1').prop('checked', true);
-    $('#stage2_1').prop('checked', true);
-    updateDeckComposition();
-  });
-
-  $('#presetNoBasic').on('click', function() {
-    $('#basic0').prop('checked', true);
-    $('#stage1_2').prop('checked', true);
-    $('#stage2_2').prop('checked', true);
+    $('#professor_2').prop('checked', true);
+    $('#pokeball_2').prop('checked', true);
+    $('#rarecandy_2').prop('checked', true);
     updateDeckComposition();
   });
 }

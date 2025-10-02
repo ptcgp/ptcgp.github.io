@@ -22,7 +22,7 @@ export function initializeEvolveSimulator() {
     const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
     const rareCandyCount = parseInt($('input[name="rareCandyCount"]:checked').val());
     const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());
-          const simulationRuns = parseInt($('#simulationRuns').val()) || 1000;
+          const simulationRuns = parseInt($('#simulationRuns').val()) || 10000;
           const debugMode = $('#debugMode').is(':checked');
     const $chartContainer = $('#evolveChartContainer');
     const $progressBar = $('.progress-bar');
