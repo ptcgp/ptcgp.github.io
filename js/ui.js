@@ -51,7 +51,7 @@ export function initializePackSimulator() {
     const runCount = parseInt($('#runCount').val());
     const $error = $('#error');
 
-    if (isNaN(packCount) || packCount < 1 || packCount > 100000) {
+    if (isNaN(packCount) || packCount < 1 || packCount > 1000000) {
       $error.removeClass('d-none');
       return;
     }
@@ -251,6 +251,10 @@ export function initializePackSimulator() {
       const cardCounts1 = PACK_CARD_COUNTS_ARRAY[packType1];
       const multiRunTable1 = [];
       
+      // Get pack name from PACK_TYPES
+      const packName1 = PACK_TYPES.find(p => p.value === packType1)?.label || packType1;
+      $('#multiRunStats1 h4').text(`${packName1} - Rarity Distribution Across All Runs`);
+      
       for (let i = 0; i < RARITIES.length; i++) {
         if (cardCounts1[i] > 0) {
           const runValues = allRunResults1.map(run => run[i]);
@@ -278,6 +282,10 @@ export function initializePackSimulator() {
       if (packType2) {
         const cardCounts2 = PACK_CARD_COUNTS_ARRAY[packType2];
         const multiRunTable2 = [];
+        
+        // Get pack name from PACK_TYPES
+        const packName2 = PACK_TYPES.find(p => p.value === packType2)?.label || packType2;
+        $('#multiRunStats2 h4').text(`${packName2} - Rarity Distribution Across All Runs`);
         
         for (let i = 0; i < RARITIES.length; i++) {
           if (cardCounts2[i] > 0) {
