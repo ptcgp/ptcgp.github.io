@@ -55,7 +55,7 @@ export function initializePackSimulator() {
       $error.removeClass('d-none');
       return;
     }
-    if (isNaN(runCount) || runCount < 1 || runCount > 1000) {
+    if (isNaN(runCount) || runCount < 1 || runCount > 10000) {
       $error.removeClass('d-none');
       return;
     }
