@@ -1,9 +1,9 @@
-import { RARITIES, RARITY_SYMBOLS, PACK_CARD_COUNTS_ARRAY, gold_price } from './constants.js';
-import { DRAW_RATES, DRAW_RATES_TYPED } from './drawRates.js';
-import { simulatePackOpening, simulateCollection, simulateSpecificCard } from './simulator.js';
 import { updateCollectionChart, updateSpecificChart } from './charts.js';
-import { findOptimalGoldPackage, calculateOptimalGoldPurchase } from './goldCalculator.js';
+import { PACK_CARD_COUNTS_ARRAY, RARITIES, RARITY_SYMBOLS, gold_price } from './constants.js';
+import { DRAW_RATES_TYPED } from './drawRates.js';
+import { calculateOptimalGoldPurchase, findOptimalGoldPackage } from './goldCalculator.js';
 import { PACK_TYPES } from './packTypes.js';
+import { simulateCollection, simulatePackOpening, simulateSpecificCard } from './simulator.js';
 
 // Function to populate all pack type dropdowns
 function populatePackTypeDropdowns() {
@@ -242,28 +242,60 @@ export function initializeCollectionSimulator() {
         } else {
           // Calculate statistics for pack type 1
           const sortedResults1 = [...results1].sort((a, b) => a - b);
+          const p10_1 = sortedResults1[Math.floor(sortedResults1.length * 0.1)];
+          const p20_1 = sortedResults1[Math.floor(sortedResults1.length * 0.2)];
+          const p30_1 = sortedResults1[Math.floor(sortedResults1.length * 0.3)];
+          const p40_1 = sortedResults1[Math.floor(sortedResults1.length * 0.4)];
+          const p50_1 = sortedResults1[Math.floor(sortedResults1.length * 0.5)];
+          const p60_1 = sortedResults1[Math.floor(sortedResults1.length * 0.6)];
+          const p70_1 = sortedResults1[Math.floor(sortedResults1.length * 0.7)];
+          const p80_1 = sortedResults1[Math.floor(sortedResults1.length * 0.8)];
+          const p90_1 = sortedResults1[Math.floor(sortedResults1.length * 0.9)];
           const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
-          const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
           const min1 = Math.min(...results1);
           const max1 = Math.max(...results1);
 
           // Update pack type 1 statistics
+          $('#p10Packs1').text(p10_1);
+          $('#p20Packs1').text(p20_1);
+          $('#p30Packs1').text(p30_1);
+          $('#p40Packs1').text(p40_1);
+          $('#p50Packs1').text(p50_1);
+          $('#p60Packs1').text(p60_1);
+          $('#p70Packs1').text(p70_1);
+          $('#p80Packs1').text(p80_1);
+          $('#p90Packs1').text(p90_1);
           $('#avgPacks1').text(avg1);
-          $('#medianPacks1').text(median1);
           $('#minPacks1').text(min1);
           $('#maxPacks1').text(max1);
 
           if (packType2) {
             // Calculate statistics for pack type 2
             const sortedResults2 = [...results2].sort((a, b) => a - b);
+            const p10_2 = sortedResults2[Math.floor(sortedResults2.length * 0.1)];
+            const p20_2 = sortedResults2[Math.floor(sortedResults2.length * 0.2)];
+            const p30_2 = sortedResults2[Math.floor(sortedResults2.length * 0.3)];
+            const p40_2 = sortedResults2[Math.floor(sortedResults2.length * 0.4)];
+            const p50_2 = sortedResults2[Math.floor(sortedResults2.length * 0.5)];
+            const p60_2 = sortedResults2[Math.floor(sortedResults2.length * 0.6)];
+            const p70_2 = sortedResults2[Math.floor(sortedResults2.length * 0.7)];
+            const p80_2 = sortedResults2[Math.floor(sortedResults2.length * 0.8)];
+            const p90_2 = sortedResults2[Math.floor(sortedResults2.length * 0.9)];
             const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
-            const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
             const min2 = Math.min(...results2);
             const max2 = Math.max(...results2);
 
             // Update pack type 2 statistics
+            $('#p10Packs2').text(p10_2);
+            $('#p20Packs2').text(p20_2);
+            $('#p30Packs2').text(p30_2);
+            $('#p40Packs2').text(p40_2);
+            $('#p50Packs2').text(p50_2);
+            $('#p60Packs2').text(p60_2);
+            $('#p70Packs2').text(p70_2);
+            $('#p80Packs2').text(p80_2);
+            $('#p90Packs2').text(p90_2);
             $('#avgPacks2').text(avg2);
-            $('#medianPacks2').text(median2);
             $('#minPacks2').text(min2);
             $('#maxPacks2').text(max2);
             $stats2Container.show();
@@ -287,11 +319,12 @@ export function initializeSpecificCardSimulator() {
   // Populate dropdown on initialization
   populatePackTypeDropdowns();
   
-  function updateTargetRarityOptions() {
+  function updateTargetRarityOptions1() {
     // Update first pack's rarities
     const packType1 = $('#specificPackType1').val();
     const cardCounts1 = PACK_CARD_COUNTS_ARRAY[packType1];
     const $targetRarity1 = $('#targetRarity1');
+    const currentValue1 = $targetRarity1.val();
 
     $targetRarity1.empty();
     cardCounts1.forEach((count, index) => {
@@ -301,9 +334,17 @@ export function initializeSpecificCardSimulator() {
       }
     });
 
+    // Restore previous selection if it's still valid
+    if (currentValue1 && $targetRarity1.find(`option[value="${currentValue1}"]`).length > 0) {
+      $targetRarity1.val(currentValue1);
+    }
+  }
+
+  function updateTargetRarityOptions2() {
     // Update second pack's rarities
     const packType2 = $('#specificPackType2').val();
     const $targetRarity2 = $('#targetRarity2');
+    const currentValue2 = $targetRarity2.val();
 
     if (packType2) {
       const cardCounts2 = PACK_CARD_COUNTS_ARRAY[packType2];
@@ -315,6 +356,11 @@ export function initializeSpecificCardSimulator() {
         }
       });
       $targetRarity2.prop('disabled', false);
+
+      // Restore previous selection if it's still valid
+      if (currentValue2 && $targetRarity2.find(`option[value="${currentValue2}"]`).length > 0) {
+        $targetRarity2.val(currentValue2);
+      }
     } else {
       $targetRarity2.empty();
       $targetRarity2.append('<option value="">Select Pack Type 2 first</option>');
@@ -323,8 +369,10 @@ export function initializeSpecificCardSimulator() {
   }
 
   // Initialize target rarity options
-  updateTargetRarityOptions();
-  $('#specificPackType1, #specificPackType2').on('change', updateTargetRarityOptions);
+  updateTargetRarityOptions1();
+  updateTargetRarityOptions2();
+  $('#specificPackType1').on('change', updateTargetRarityOptions1);
+  $('#specificPackType2').on('change', updateTargetRarityOptions2);
 
   // Specific Card Simulator
   $('#simulateSpecificBtn').on('click', function() {
@@ -368,28 +416,60 @@ export function initializeSpecificCardSimulator() {
         } else {
           // Calculate statistics for rarity 1
           const sortedResults1 = [...results1].sort((a, b) => a - b);
+          const p10_1 = sortedResults1[Math.floor(sortedResults1.length * 0.1)];
+          const p20_1 = sortedResults1[Math.floor(sortedResults1.length * 0.2)];
+          const p30_1 = sortedResults1[Math.floor(sortedResults1.length * 0.3)];
+          const p40_1 = sortedResults1[Math.floor(sortedResults1.length * 0.4)];
+          const p50_1 = sortedResults1[Math.floor(sortedResults1.length * 0.5)];
+          const p60_1 = sortedResults1[Math.floor(sortedResults1.length * 0.6)];
+          const p70_1 = sortedResults1[Math.floor(sortedResults1.length * 0.7)];
+          const p80_1 = sortedResults1[Math.floor(sortedResults1.length * 0.8)];
+          const p90_1 = sortedResults1[Math.floor(sortedResults1.length * 0.9)];
           const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
-          const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
           const min1 = Math.min(...results1);
           const max1 = Math.max(...results1);
 
           // Update rarity 1 statistics
+          $('#p10PacksSpecific1').text(p10_1);
+          $('#p20PacksSpecific1').text(p20_1);
+          $('#p30PacksSpecific1').text(p30_1);
+          $('#p40PacksSpecific1').text(p40_1);
+          $('#p50PacksSpecific1').text(p50_1);
+          $('#p60PacksSpecific1').text(p60_1);
+          $('#p70PacksSpecific1').text(p70_1);
+          $('#p80PacksSpecific1').text(p80_1);
+          $('#p90PacksSpecific1').text(p90_1);
           $('#avgPacksSpecific1').text(avg1);
-          $('#medianPacksSpecific1').text(median1);
           $('#minPacksSpecific1').text(min1);
           $('#maxPacksSpecific1').text(max1);
 
           if (packType2 && targetRarity2 !== null) {
             // Calculate statistics for rarity 2
             const sortedResults2 = [...results2].sort((a, b) => a - b);
+            const p10_2 = sortedResults2[Math.floor(sortedResults2.length * 0.1)];
+            const p20_2 = sortedResults2[Math.floor(sortedResults2.length * 0.2)];
+            const p30_2 = sortedResults2[Math.floor(sortedResults2.length * 0.3)];
+            const p40_2 = sortedResults2[Math.floor(sortedResults2.length * 0.4)];
+            const p50_2 = sortedResults2[Math.floor(sortedResults2.length * 0.5)];
+            const p60_2 = sortedResults2[Math.floor(sortedResults2.length * 0.6)];
+            const p70_2 = sortedResults2[Math.floor(sortedResults2.length * 0.7)];
+            const p80_2 = sortedResults2[Math.floor(sortedResults2.length * 0.8)];
+            const p90_2 = sortedResults2[Math.floor(sortedResults2.length * 0.9)];
             const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
-            const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
             const min2 = Math.min(...results2);
             const max2 = Math.max(...results2);
 
             // Update rarity 2 statistics
+            $('#p10PacksSpecific2').text(p10_2);
+            $('#p20PacksSpecific2').text(p20_2);
+            $('#p30PacksSpecific2').text(p30_2);
+            $('#p40PacksSpecific2').text(p40_2);
+            $('#p50PacksSpecific2').text(p50_2);
+            $('#p60PacksSpecific2').text(p60_2);
+            $('#p70PacksSpecific2').text(p70_2);
+            $('#p80PacksSpecific2').text(p80_2);
+            $('#p90PacksSpecific2').text(p90_2);
             $('#avgPacksSpecific2').text(avg2);
-            $('#medianPacksSpecific2').text(median2);
             $('#minPacksSpecific2').text(min2);
             $('#maxPacksSpecific2').text(max2);
             $stats2Container.show();
