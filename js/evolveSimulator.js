@@ -216,11 +216,12 @@ export function initializeEvolveSimulator() {
     updateDeckComposition();
   });
 
-  $('#simulateEvolveBtn').on('click', function() {
-    const basicCount = parseInt($('input[name="basicCount"]:checked').val());
-    const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
-    const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
-    const targetStage2Count = parseInt($('#targetStage2Count').val());
+        $('#simulateEvolveBtn').on('click', function() {
+          const basicCount = parseInt($('input[name="basicCount"]:checked').val());
+          const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
+          const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
+          const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());
+          const simulationRuns = parseInt($('#simulationRuns').val()) || 1000;
     const $chartContainer = $('#evolveChartContainer');
     const $progressBar = $('.progress-bar');
     
@@ -257,7 +258,7 @@ export function initializeEvolveSimulator() {
 
     setTimeout(() => {
       const results = [];
-      const totalTrials = 10000;
+      const totalTrials = simulationRuns;
       const batchSize = 50;
       let processed = 0;
 
