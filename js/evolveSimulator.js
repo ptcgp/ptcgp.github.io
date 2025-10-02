@@ -106,6 +106,12 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   return firstStage2Turn;
 }
 
+// Global variables to store previous results
+let previousResults = null;
+let previousConfig = null;
+let simulationCount = 0;
+let isCreatingCharts = false;
+
 export function initializeEvolveSimulator() {
   // Update deck composition display when inputs change
   function updateDeckComposition() {
@@ -212,6 +218,18 @@ export function initializeEvolveSimulator() {
     const targetStage2Count = parseInt($('#targetStage2Count').val());
     const $chartContainer = $('#evolveChartContainer');
     const $progressBar = $('.progress-bar');
+    
+    // Store current configuration
+    const currentConfig = {
+      basicCount,
+      stage1Count,
+      stage2Count,
+      targetStage2Count,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    
+    // Increment simulation count
+    simulationCount++;
 
     // Validate deck composition
     const totalCards = basicCount + stage1Count + stage2Count;
@@ -327,26 +345,36 @@ export function initializeEvolveSimulator() {
           }
           $('#evolveProbabilityTable').html(tableRows.join(''));
 
+          // Store current results
+          const currentResults = {
+            results,
+            turnProbabilities,
+            cumulativeProbabilities,
+            successfulEvolutions,
+            successRate,
+            config: currentConfig
+          };
+          
           // Remove loading state and update chart
           $chartContainer.removeClass('loading');
           $chartContainer.find('.progress').hide();
           
-          try {
-            updateEvolveChart(results, turnProbabilities, cumulativeProbabilities);
-          } catch (error) {
-            console.error('Error updating chart:', error);
-            $chartContainer.html(`
-              <div class="alert alert-danger">
-                <h5>Chart Error</h5>
-                <p>Unable to create chart. Results:</p>
-                <ul>
-                  <li>Success Rate: ${successRate}%</li>
-                  <li>Successful Evolutions: ${successfulEvolutions}</li>
-                  <li>Total Trials: ${totalTrials}</li>
-                </ul>
-              </div>
-            `);
+          // Create comparison layout if we have previous results
+          if (previousResults && simulationCount > 1) {
+            // Clear any existing charts first
+            if (window.evolveChartInstance) {
+              window.evolveChartInstance.destroy();
+              window.evolveChartInstance = null;
+            }
+            createComparisonLayout(currentResults, previousResults);
+          } else {
+            // First simulation - show single result
+            displaySingleResult(currentResults);
           }
+          
+          // Store current results as previous for next comparison
+          previousResults = currentResults;
+          previousConfig = currentConfig;
         }
       }
 
@@ -354,4 +382,248 @@ export function initializeEvolveSimulator() {
       processBatch();
     }, 50);
   });
+}
+
+// Function to display single result
+function displaySingleResult(results) {
+  const $chartContainer = $('#evolveChartContainer');
+  
+  try {
+    updateEvolveChart(results.results, results.turnProbabilities, results.cumulativeProbabilities);
+  } catch (error) {
+    console.error('Error updating chart:', error);
+    $chartContainer.html(`
+      <div class="alert alert-danger">
+        <h5>Chart Error</h5>
+        <p>Unable to create chart. Results:</p>
+        <ul>
+          <li>Success Rate: ${results.successRate}%</li>
+          <li>Successful Evolutions: ${results.successfulEvolutions}</li>
+        </ul>
+      </div>
+    `);
+  }
+}
+
+// Function to create comparison layout
+function createComparisonLayout(currentResults, previousResults) {
+  const $chartContainer = $('#evolveChartContainer');
+  
+  // Simple text-based comparison to avoid chart issues
+  $chartContainer.html(`
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-bar me-2"></i>Previous Simulation
+              <small class="text-muted">(${previousResults.config.timestamp})</small>
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <strong>Config:</strong> ${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count}
+              <br><strong>Success Rate:</strong> ${previousResults.successRate}%
+              <br><strong>Successful Evolutions:</strong> ${previousResults.successfulEvolutions}
+            </div>
+            <div class="progress mb-2">
+              <div class="progress-bar bg-primary" style="width: ${previousResults.successRate}%"></div>
+            </div>
+            <small class="text-muted">Success Rate: ${previousResults.successRate}%</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-line me-2"></i>Current Simulation
+              <small class="text-muted">(${currentResults.config.timestamp})</small>
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <strong>Config:</strong> ${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count}
+              <br><strong>Success Rate:</strong> ${currentResults.successRate}%
+              <br><strong>Successful Evolutions:</strong> ${currentResults.successfulEvolutions}
+            </div>
+            <div class="progress mb-2">
+              <div class="progress-bar bg-success" style="width: ${currentResults.successRate}%"></div>
+            </div>
+            <small class="text-muted">Success Rate: ${currentResults.successRate}%</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-balance-scale me-2"></i>Comparison Summary
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Previous (${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count})</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Success Rate:</strong> ${previousResults.successRate}%</li>
+                  <li><strong>Successful Evolutions:</strong> ${previousResults.successfulEvolutions}</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6>Current (${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count})</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Success Rate:</strong> ${currentResults.successRate}%</li>
+                  <li><strong>Successful Evolutions:</strong> ${currentResults.successfulEvolutions}</li>
+                </ul>
+              </div>
+            </div>
+            <hr>
+            <div class="text-center">
+              <strong>Improvement:</strong> 
+              <span class="badge ${parseFloat(currentResults.successRate) > parseFloat(previousResults.successRate) ? 'bg-success' : 'bg-danger'}">
+                ${(parseFloat(currentResults.successRate) - parseFloat(previousResults.successRate)).toFixed(2)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Turn-by-Turn Comparison -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-clock me-2"></i>Turn-by-Turn Evolution Comparison
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Turn</th>
+                    <th>Previous (${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count})</th>
+                    <th>Current (${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count})</th>
+                    <th>Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${generateTurnComparisonTable(previousResults, currentResults)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Evolution Timing Analysis -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-line me-2"></i>Evolution Timing Analysis
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Previous Simulation</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Average Turns:</strong> ${calculateAverageTurns(previousResults.results)}</li>
+                  <li><strong>Fastest Evolution:</strong> ${Math.min(...previousResults.results)} turns</li>
+                  <li><strong>Slowest Evolution:</strong> ${Math.max(...previousResults.results)} turns</li>
+                  <li><strong>Median Turns:</strong> ${calculateMedianTurns(previousResults.results)}</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6>Current Simulation</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Average Turns:</strong> ${calculateAverageTurns(currentResults.results)}</li>
+                  <li><strong>Fastest Evolution:</strong> ${Math.min(...currentResults.results)} turns</li>
+                  <li><strong>Slowest Evolution:</strong> ${Math.max(...currentResults.results)} turns</li>
+                  <li><strong>Median Turns:</strong> ${calculateMedianTurns(currentResults.results)}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+// Helper function to generate turn comparison table
+function generateTurnComparisonTable(previousResults, currentResults) {
+  const maxTurns = Math.max(
+    Math.max(...previousResults.results),
+    Math.max(...currentResults.results)
+  );
+  
+  let tableRows = '';
+  
+  for (let turn = 1; turn <= Math.min(maxTurns, 20); turn++) {
+    const prevEvolvedByTurn = previousResults.results.filter(turns => turns <= turn).length;
+    const currEvolvedByTurn = currentResults.results.filter(turns => turns <= turn).length;
+    const prevPercentage = ((prevEvolvedByTurn / previousResults.results.length) * 100).toFixed(1);
+    const currPercentage = ((currEvolvedByTurn / currentResults.results.length) * 100).toFixed(1);
+    const difference = (parseFloat(currPercentage) - parseFloat(prevPercentage)).toFixed(1);
+    
+    const differenceClass = parseFloat(difference) > 0 ? 'text-success' : parseFloat(difference) < 0 ? 'text-danger' : 'text-muted';
+    const differenceIcon = parseFloat(difference) > 0 ? '↗' : parseFloat(difference) < 0 ? '↘' : '→';
+    
+    tableRows += `
+      <tr>
+        <td><strong>Turn ${turn}</strong></td>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="progress flex-grow-1 me-2" style="height: 20px;">
+              <div class="progress-bar bg-primary" style="width: ${prevPercentage}%"></div>
+            </div>
+            <span class="badge bg-primary">${prevPercentage}%</span>
+          </div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="progress flex-grow-1 me-2" style="height: 20px;">
+              <div class="progress-bar bg-success" style="width: ${currPercentage}%"></div>
+            </div>
+            <span class="badge bg-success">${currPercentage}%</span>
+          </div>
+        </td>
+        <td class="${differenceClass}">
+          <strong>${differenceIcon} ${Math.abs(difference)}%</strong>
+        </td>
+      </tr>
+    `;
+  }
+  
+  return tableRows;
+}
+
+// Helper function to calculate average turns
+function calculateAverageTurns(results) {
+  if (results.length === 0) return 'N/A';
+  const sum = results.reduce((a, b) => a + b, 0);
+  return (sum / results.length).toFixed(1);
+}
+
+// Helper function to calculate median turns
+function calculateMedianTurns(results) {
+  if (results.length === 0) return 'N/A';
+  const sorted = [...results].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 
+    ? ((sorted[mid - 1] + sorted[mid]) / 2).toFixed(1)
+    : sorted[mid].toFixed(1);
 }
