@@ -1,6 +1,6 @@
 import { updateEvolveChart } from './charts.js';
 
-export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, targetStage2Count) {
+export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, targetStage2Count) {
   // Create a deck of 20 cards with each card type appearing max twice
   const deck = [];
   
@@ -17,6 +17,16 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   // Add Stage 2 evolution cards
   for (let i = 0; i < stage2Count; i++) {
     deck.push({ type: 'stage2', name: `Stage 2 ${i + 1}` });
+  }
+  
+  // Add Cyrus cards
+  for (let i = 0; i < cyrusCount; i++) {
+    deck.push({ type: 'cyrus', name: 'Cyrus' });
+  }
+  
+  // Add Professor's Research cards
+  for (let i = 0; i < professorCount; i++) {
+    deck.push({ type: 'professor', name: 'Professor\'s Research' });
   }
   
   // Fill remaining slots with other cards (energy, trainers, etc.)
@@ -54,10 +64,17 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   // Track when we first get a Stage 2 Pokemon
   let firstStage2Turn = -1;
   let basicPlayedThisTurn = false;
+  let supporterPlayedThisTurn = false;
   
   while (stage2Pokemon < targetStage2Count) {
     turns++;
     basicPlayedThisTurn = false;
+    supporterPlayedThisTurn = false;
+    
+    // Debug: Log turn start
+    if (turns <= 3) {
+      console.log(`Starting turn ${turns}`);
+    }
     
     // Each turn: Draw 1 card at the beginning
     if (deck.length > 0) {
@@ -73,12 +90,36 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       basicPlayedThisTurn = true;
     }
     
+    // Each turn: can play 1 Supporter card (Cyrus or Professor's Research)
+    const cyrusInHand = hand.find(card => card.type === 'cyrus');
+    const professorInHand = hand.find(card => card.type === 'professor');
+    
+    if (cyrusInHand) {
+      // Play Cyrus
+      hand = hand.filter(card => card !== cyrusInHand);
+      supporterPlayedThisTurn = true;
+    } else if (professorInHand) {
+      // Play Professor's Research - Draw 2 cards
+      hand = hand.filter(card => card !== professorInHand);
+      supporterPlayedThisTurn = true;
+      
+      // Professor's Research effect: Draw 2 cards
+      for (let i = 0; i < 2 && deck.length > 0; i++) {
+        hand.push(deck.shift());
+      }
+    }
+    
     // Check for evolution cards in hand
     const stage1InHand = hand.find(card => card.type === 'stage1');
     const stage2InHand = hand.find(card => card.type === 'stage2');
     
     // Each turn: can evolve maximum 1 time, but NOT if Basic was played this turn
-    if (!basicPlayedThisTurn) {
+    // AND NOT on Turn 1 (Turn 1 can never evolve)
+    if (turns <= 3) {
+      console.log(`Turn ${turns}: basicPlayedThisTurn=${basicPlayedThisTurn}, turns > 1=${turns > 1}, can evolve=${!basicPlayedThisTurn && turns > 1}`);
+    }
+    
+    if (!basicPlayedThisTurn && turns > 1) {
       if (stage1InHand && field.some(pokemon => pokemon.type === 'basic')) {
         // Evolve Basic to Stage 1
         const basicInField = field.find(pokemon => pokemon.type === 'basic');
@@ -96,6 +137,10 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
         // Record when we first get a Stage 2 Pokemon
         if (firstStage2Turn === -1) {
           firstStage2Turn = turns;
+          // Debug: Log when Stage 2 evolution happens
+          if (turns <= 3) {
+            console.log(`Stage 2 evolution on turn ${turns}! This should not happen on turn 1.`);
+          }
         }
       }
     }
@@ -123,7 +168,9 @@ export function initializeEvolveSimulator() {
     const basicCount = parseInt($('input[name="basicCount"]:checked').val());
     const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
     const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
-    const totalCards = basicCount + stage1Count + stage2Count;
+    const cyrusCount = parseInt($('input[name="cyrusCount"]:checked').val());
+    const professorCount = parseInt($('input[name="professorCount"]:checked').val());
+    const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount;
     const remainingCards = 20 - totalCards;
     
     $('#deckComposition').html(`
@@ -135,25 +182,37 @@ export function initializeEvolveSimulator() {
         </div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-md-3 col-6">
+            <div class="col-md-2 col-6">
               <div class="text-center">
                 <div class="h4 text-primary mb-1">${basicCount}</div>
                 <div class="small text-muted">Basic Pokemon</div>
               </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-2 col-6">
               <div class="text-center">
                 <div class="h4 text-success mb-1">${stage1Count}</div>
                 <div class="small text-muted">Stage 1 Pokemon</div>
               </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-2 col-6">
               <div class="text-center">
                 <div class="h4 text-warning mb-1">${stage2Count}</div>
                 <div class="small text-muted">Stage 2 Pokemon</div>
               </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-2 col-6">
+              <div class="text-center">
+                <div class="h4 text-danger mb-1">${cyrusCount}</div>
+                <div class="small text-muted">Cyrus</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-6">
+              <div class="text-center">
+                <div class="h4 text-info mb-1">${professorCount}</div>
+                <div class="small text-muted">Professor's Research</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-6">
               <div class="text-center">
                 <div class="h4 text-secondary mb-1">${remainingCards}</div>
                 <div class="small text-muted">Other Cards</div>
@@ -162,7 +221,7 @@ export function initializeEvolveSimulator() {
           </div>
           <hr class="my-3">
           <div class="text-center">
-            <span class="badge bg-primary fs-6">Total: ${totalCards} Pokemon + ${remainingCards} Other = 20 Cards</span>
+            <span class="badge bg-primary fs-6">Total: ${totalCards} Cards + ${remainingCards} Other = 20 Cards</span>
           </div>
         </div>
       </div>
@@ -170,7 +229,7 @@ export function initializeEvolveSimulator() {
   }
 
   // Update deck composition on input changes
-  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"]').on('change', updateDeckComposition);
+  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"], input[name="cyrusCount"], input[name="professorCount"]').on('change', updateDeckComposition);
   updateDeckComposition(); // Initial update
 
   // Preset configurations
@@ -220,6 +279,8 @@ export function initializeEvolveSimulator() {
           const basicCount = parseInt($('input[name="basicCount"]:checked').val());
           const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
           const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
+          const cyrusCount = parseInt($('input[name="cyrusCount"]:checked').val());
+          const professorCount = parseInt($('input[name="professorCount"]:checked').val());
           const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());
           const simulationRuns = parseInt($('#simulationRuns').val()) || 1000;
     const $chartContainer = $('#evolveChartContainer');
@@ -230,6 +291,8 @@ export function initializeEvolveSimulator() {
       basicCount,
       stage1Count,
       stage2Count,
+      cyrusCount,
+      professorCount,
       targetStage2Count,
       timestamp: new Date().toLocaleTimeString()
     };
@@ -264,7 +327,7 @@ export function initializeEvolveSimulator() {
 
       function processBatch() {
         for (let i = 0; i < batchSize && processed < totalTrials; i++) {
-          const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, targetStage2Count);
+          const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, targetStage2Count);
           // Only include successful evolutions (not -1)
           if (result !== -1) {
             results.push(result);
@@ -429,6 +492,7 @@ function createComparisonLayout(currentResults, previousResults) {
           <div class="card-body">
             <div class="mb-3">
               <strong>Config:</strong> ${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count}
+              <br><strong>Supporters:</strong> ${getSupporterInfo(previousResults.config)}
               <br><strong>Success Rate:</strong> ${previousResults.successRate}%
               <br><strong>Successful Evolutions:</strong> ${previousResults.successfulEvolutions}
             </div>
@@ -450,6 +514,7 @@ function createComparisonLayout(currentResults, previousResults) {
           <div class="card-body">
             <div class="mb-3">
               <strong>Config:</strong> ${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count}
+              <br><strong>Supporters:</strong> ${getSupporterInfo(currentResults.config)}
               <br><strong>Success Rate:</strong> ${currentResults.successRate}%
               <br><strong>Successful Evolutions:</strong> ${currentResults.successfulEvolutions}
             </div>
@@ -474,6 +539,7 @@ function createComparisonLayout(currentResults, previousResults) {
               <div class="col-md-6">
                 <h6>Previous (${previousResults.config.basicCount}-${previousResults.config.stage1Count}-${previousResults.config.stage2Count})</h6>
                 <ul class="list-unstyled">
+                  <li><strong>Supporters:</strong> ${getSupporterInfo(previousResults.config)}</li>
                   <li><strong>Success Rate:</strong> ${previousResults.successRate}%</li>
                   <li><strong>Successful Evolutions:</strong> ${previousResults.successfulEvolutions}</li>
                 </ul>
@@ -481,6 +547,7 @@ function createComparisonLayout(currentResults, previousResults) {
               <div class="col-md-6">
                 <h6>Current (${currentResults.config.basicCount}-${currentResults.config.stage1Count}-${currentResults.config.stage2Count})</h6>
                 <ul class="list-unstyled">
+                  <li><strong>Supporters:</strong> ${getSupporterInfo(currentResults.config)}</li>
                   <li><strong>Success Rate:</strong> ${currentResults.successRate}%</li>
                   <li><strong>Successful Evolutions:</strong> ${currentResults.successfulEvolutions}</li>
                 </ul>
@@ -650,6 +717,25 @@ function generateTurnComparisonTable(previousResults, currentResults) {
   return tableRows;
 }
 
+// Helper function to get supporter card information
+function getSupporterInfo(config) {
+  const cyrusCount = config.cyrusCount || 0;
+  const professorCount = config.professorCount || 0;
+  
+  let supporterText = '';
+  if (cyrusCount > 0 && professorCount > 0) {
+    supporterText = `Cyrus: ${cyrusCount}, Professor: ${professorCount}`;
+  } else if (cyrusCount > 0) {
+    supporterText = `Cyrus: ${cyrusCount}`;
+  } else if (professorCount > 0) {
+    supporterText = `Professor: ${professorCount}`;
+  } else {
+    supporterText = 'No Supporters';
+  }
+  
+  return supporterText;
+}
+
 // Helper function to calculate average turns
 function calculateAverageTurns(results) {
   if (results.length === 0) return 'N/A';
@@ -680,6 +766,36 @@ function createComparisonCharts(previousResults, currentResults) {
       window.currentChartInstance = null;
     }
     
+    // Calculate frequency data for previous results
+    const prevFrequencyData = [];
+    for (let turn = 1; turn <= 20; turn++) {
+      const evolvedOnTurn = previousResults.results.filter(turns => turns === turn).length;
+      prevFrequencyData.push(evolvedOnTurn);
+    }
+    
+    // Calculate cumulative probabilities for previous results
+    const prevCumulativeData = [];
+    for (let turn = 1; turn <= 20; turn++) {
+      const evolvedByTurn = previousResults.results.filter(turns => turns <= turn).length;
+      const percentage = ((evolvedByTurn / previousResults.results.length) * 100).toFixed(1);
+      prevCumulativeData.push(parseFloat(percentage));
+    }
+    
+    // Calculate frequency data for current results
+    const currFrequencyData = [];
+    for (let turn = 1; turn <= 20; turn++) {
+      const evolvedOnTurn = currentResults.results.filter(turns => turns === turn).length;
+      currFrequencyData.push(evolvedOnTurn);
+    }
+    
+    // Calculate cumulative probabilities for current results
+    const currCumulativeData = [];
+    for (let turn = 1; turn <= 20; turn++) {
+      const evolvedByTurn = currentResults.results.filter(turns => turns <= turn).length;
+      const percentage = ((evolvedByTurn / currentResults.results.length) * 100).toFixed(1);
+      currCumulativeData.push(parseFloat(percentage));
+    }
+    
     // Create previous chart
     const prevCanvas = document.getElementById('previousChart');
     if (prevCanvas && prevCanvas.tagName === 'CANVAS') {
@@ -687,25 +803,52 @@ function createComparisonCharts(previousResults, currentResults) {
       window.previousChartInstance = new Chart(prevCtx, {
         type: 'bar',
         data: {
-          labels: Array.from({length: Math.min(20, previousResults.results.length)}, (_, i) => `Turn ${i + 1}`),
+          labels: Array.from({length: 20}, (_, i) => `Turn ${i + 1}`),
           datasets: [{
-            label: 'Evolution Frequency',
-            data: previousResults.results.slice(0, 20),
+            label: 'Frequency',
+            data: prevFrequencyData,
             backgroundColor: 'rgba(54, 162, 235, 0.6)',
             borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
+            borderWidth: 1,
+            yAxisID: 'y'
+          }, {
+            label: 'Cumulative Probability (%)',
+            data: prevCumulativeData,
+            type: 'line',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y1'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: { 
-              beginAtZero: true,
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
               title: {
                 display: true,
                 text: 'Frequency'
-              }
+              },
+              beginAtZero: true
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Cumulative Probability (%)'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+              beginAtZero: true,
+              max: 100
             },
             x: {
               title: {
@@ -731,25 +874,52 @@ function createComparisonCharts(previousResults, currentResults) {
       window.currentChartInstance = new Chart(currCtx, {
         type: 'bar',
         data: {
-          labels: Array.from({length: Math.min(20, currentResults.results.length)}, (_, i) => `Turn ${i + 1}`),
+          labels: Array.from({length: 20}, (_, i) => `Turn ${i + 1}`),
           datasets: [{
-            label: 'Evolution Frequency',
-            data: currentResults.results.slice(0, 20),
+            label: 'Frequency',
+            data: currFrequencyData,
             backgroundColor: 'rgba(255, 99, 132, 0.6)',
             borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1
+            borderWidth: 1,
+            yAxisID: 'y'
+          }, {
+            label: 'Cumulative Probability (%)',
+            data: currCumulativeData,
+            type: 'line',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y1'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: { 
-              beginAtZero: true,
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
               title: {
                 display: true,
                 text: 'Frequency'
-              }
+              },
+              beginAtZero: true
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Cumulative Probability (%)'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+              beginAtZero: true,
+              max: 100
             },
             x: {
               title: {
