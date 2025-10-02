@@ -267,11 +267,11 @@ export function initializePackSimulator() {
           
           multiRunTable1.push(`
             <tr>
-              <td>${RARITIES[i].name}</td>
-              <td>${avg}</td>
-              <td>${min}</td>
-              <td>${max}</td>
-              <td>${stdDev}</td>
+              <td class="text-start fw-bold">${RARITIES[i].name}</td>
+              <td class="text-end font-monospace">${avg}</td>
+              <td class="text-end font-monospace">${min}</td>
+              <td class="text-end font-monospace">${max}</td>
+              <td class="text-end font-monospace">${stdDev}</td>
             </tr>
           `);
         }
@@ -299,11 +299,11 @@ export function initializePackSimulator() {
             
             multiRunTable2.push(`
               <tr>
-                <td>${RARITIES[i].name}</td>
-                <td>${avg}</td>
-                <td>${min}</td>
-                <td>${max}</td>
-                <td>${stdDev}</td>
+                <td class="text-start fw-bold">${RARITIES[i].name}</td>
+                <td class="text-end font-monospace">${avg}</td>
+                <td class="text-end font-monospace">${min}</td>
+                <td class="text-end font-monospace">${max}</td>
+                <td class="text-end font-monospace">${stdDev}</td>
               </tr>
             `);
           }

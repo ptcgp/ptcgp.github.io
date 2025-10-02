@@ -1,0 +1,333 @@
+<!-- Deck Configuration Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Deck Configuration</h5>
+    </div>
+    <div class="card-body">
+        <!-- Row 1: Pokemon Cards -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-primary">Basic Pokemon</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="basicCount" id="basic0" value="0">
+                        <label class="btn btn-outline-primary" for="basic0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="basicCount" id="basic1" value="1">
+                        <label class="btn btn-outline-primary" for="basic1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="basicCount" id="basic2" value="2" checked>
+                        <label class="btn btn-outline-primary" for="basic2">2</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-success">Stage 1 Pokemon</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="stage1Count" id="stage1_0" value="0">
+                        <label class="btn btn-outline-success" for="stage1_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="stage1Count" id="stage1_1" value="1">
+                        <label class="btn btn-outline-success" for="stage1_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="stage1Count" id="stage1_2" value="2" checked>
+                        <label class="btn btn-outline-success" for="stage1_2">2</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-warning">Stage 2 Pokemon</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="stage2Count" id="stage2_0" value="0">
+                        <label class="btn btn-outline-warning" for="stage2_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="stage2Count" id="stage2_1" value="1" checked>
+                        <label class="btn btn-outline-warning" for="stage2_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="stage2Count" id="stage2_2" value="2">
+                        <label class="btn btn-outline-warning" for="stage2_2">2</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Row 2: Supporter and Item Cards -->
+        <div class="row g-3">
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-info">Professor's Research</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="professorCount" id="professor_0" value="0">
+                        <label class="btn btn-outline-info" for="professor_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="professorCount" id="professor_1" value="1">
+                        <label class="btn btn-outline-info" for="professor_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="professorCount" id="professor_2" value="2" checked>
+                        <label class="btn btn-outline-info" for="professor_2">2</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-dark">Poké Ball</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_0" value="0">
+                        <label class="btn btn-outline-dark" for="pokeball_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_1" value="1">
+                        <label class="btn btn-outline-dark" for="pokeball_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="pokeballCount" id="pokeball_2" value="2" checked>
+                        <label class="btn btn-outline-dark" for="pokeball_2">2</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-success">Rare Candy</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_0" value="0">
+                        <label class="btn btn-outline-success" for="rarecandy_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_1" value="1">
+                        <label class="btn btn-outline-success" for="rarecandy_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="rareCandyCount" id="rarecandy_2" value="2" checked>
+                        <label class="btn btn-outline-success" for="rarecandy_2">2</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Row 3: Additional Item Cards and Other Pokemon -->
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-warning">Pokémon Communication</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="communicationCount" id="communication_0" value="0" checked>
+                        <label class="btn btn-outline-warning" for="communication_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="communicationCount" id="communication_1" value="1">
+                        <label class="btn btn-outline-warning" for="communication_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="communicationCount" id="communication_2" value="2">
+                        <label class="btn btn-outline-warning" for="communication_2">2</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-primary">Other Basic</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="otherBasicCount" id="otherBasic_0" value="0" checked>
+                        <label class="btn btn-outline-primary" for="otherBasic_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="otherBasicCount" id="otherBasic_1" value="1">
+                        <label class="btn btn-outline-primary" for="otherBasic_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="otherBasicCount" id="otherBasic_2" value="2">
+                        <label class="btn btn-outline-primary" for="otherBasic_2">2</label>
+                        
+                        <input type="radio" class="btn-check" name="otherBasicCount" id="otherBasic_3" value="3">
+                        <label class="btn btn-outline-primary" for="otherBasic_3">3</label>
+                        
+                        <input type="radio" class="btn-check" name="otherBasicCount" id="otherBasic_4" value="4">
+                        <label class="btn btn-outline-primary" for="otherBasic_4">4</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-success">Other Stage 1</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="otherStage1Count" id="otherStage1_0" value="0" checked>
+                        <label class="btn btn-outline-success" for="otherStage1_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage1Count" id="otherStage1_1" value="1">
+                        <label class="btn btn-outline-success" for="otherStage1_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage1Count" id="otherStage1_2" value="2">
+                        <label class="btn btn-outline-success" for="otherStage1_2">2</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage1Count" id="otherStage1_3" value="3">
+                        <label class="btn btn-outline-success" for="otherStage1_3">3</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage1Count" id="otherStage1_4" value="4">
+                        <label class="btn btn-outline-success" for="otherStage1_4">4</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-warning">Other Stage 2</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="otherStage2Count" id="otherStage2_0" value="0" checked>
+                        <label class="btn btn-outline-warning" for="otherStage2_0">0</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage2Count" id="otherStage2_1" value="1">
+                        <label class="btn btn-outline-warning" for="otherStage2_1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage2Count" id="otherStage2_2" value="2">
+                        <label class="btn btn-outline-warning" for="otherStage2_2">2</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage2Count" id="otherStage2_3" value="3">
+                        <label class="btn btn-outline-warning" for="otherStage2_3">3</label>
+                        
+                        <input type="radio" class="btn-check" name="otherStage2Count" id="otherStage2_4" value="4">
+                        <label class="btn btn-outline-warning" for="otherStage2_4">4</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row g-4 align-items-end">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-info">Target Stage 2 Count</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="targetStage2Count" id="target1" value="1" checked>
+                        <label class="btn btn-outline-info" for="target1">1</label>
+                        
+                        <input type="radio" class="btn-check" name="targetStage2Count" id="target2" value="2">
+                        <label class="btn btn-outline-info" for="target2">2</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-secondary">Simulation Runs</label>
+                    <div class="d-flex justify-content-center">
+                        <input type="number" id="simulationRuns" class="form-control form-control-lg text-center" min="100" max="100000" value="10000" style="max-width: 150px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-secondary">Debug</label>
+                    <div class="form-check d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" id="debugMode" style="transform: scale(1.5);">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <label class="form-label fw-bold text-transparent">Simulate</label>
+                    <button id="simulateEvolveBtn" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-play me-2"></i>Simulate Evolution
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preset Configurations -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Quick Presets</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-3 col-sm-6">
+                <button type="button" class="btn btn-outline-primary w-100" id="presetBalanced">
+                    <i class="fas fa-balance-scale me-2"></i>Full Support (2-2-2-2-2-2-2-2)
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <button type="button" class="btn btn-outline-success w-100" id="presetHeavy">
+                    <i class="fas fa-arrow-up me-2"></i>Min Stage 1 (2-1-2-2-2-2-2-2)
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <button type="button" class="btn btn-outline-info w-100" id="presetLight">
+                    <i class="fas fa-arrow-down me-2"></i>No Stage 1 (2-0-2-2-2-2-2-2)
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <button type="button" class="btn btn-outline-warning w-100" id="presetMinimal">
+                    <i class="fas fa-leaf me-2"></i>Minimal (2-2-2-0-0-0-0)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deck Composition Display -->
+<div id="deckComposition" class="mb-4"></div>
+
+<div class="results-section">
+    <h2 class="h4 mb-4">Evolution Probability Results</h2>
+    
+    <!-- Debug Output Area -->
+    <div id="debugOutput" class="mb-4" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bug me-2"></i>Debug Mode - Step-by-Step Simulation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="debugSteps" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9em;">
+                    <!-- Debug output will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="evolveChartContainer" style="height: 500px;">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <canvas id="evolveChart"></canvas>
+    </div>
+    <div id="evolveStats" class="mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="h5">Evolution Statistics</h3>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Success Rate:</span>
+                    <span id="successRateEvolve">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Average Turns to Evolve:</span>
+                    <span id="avgTurnsEvolve">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Median Turns to Evolve:</span>
+                    <span id="medianTurnsEvolve">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Minimum Turns:</span>
+                    <span id="minTurnsEvolve">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Maximum Turns:</span>
+                    <span id="maxTurnsEvolve">-</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="h5">Turn-by-Turn Probability</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Turn</th>
+                                <th>Evolution Probability</th>
+                                <th>Cumulative Probability</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evolveProbabilityTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

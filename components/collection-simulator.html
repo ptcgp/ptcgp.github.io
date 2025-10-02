@@ -1,0 +1,148 @@
+<div class="row g-3 align-items-end mb-4">
+    <div class="col-md-4">
+        <label for="collectionPackType1" class="form-label">Pack Type 1</label>
+        <select id="collectionPackType1" class="form-select">
+            <!-- Options populated dynamically -->
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="collectionPackType2" class="form-label">Pack Type 2 (Optional)</label>
+        <select id="collectionPackType2" class="form-select">
+            <option value="">None</option>
+            <!-- Options populated dynamically -->
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button id="simulateCollectionBtn" class="btn btn-primary w-100">Simulate</button>
+    </div>
+</div>
+
+<div class="form-check mb-4">
+    <input class="form-check-input" type="checkbox" id="excludeRareCards">
+    <label class="form-check-label" for="excludeRareCards">
+        Only collect common cards (♢, ♢♢, ♢♢♢, ♢♢♢♢)
+    </label>
+</div>
+
+<div class="form-check mb-4">
+    <input class="form-check-input" type="checkbox" id="doubleCollection">
+    <label class="form-check-label" for="doubleCollection">
+        x2 for all cards (collect each cards twice)
+    </label>
+</div>
+
+<div class="results-section">
+    <h2 class="h4 mb-4">Collection Completion Results (10000 trials)</h2>
+    <div id="chartContainer" style="height: 500px;">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <canvas id="collectionChart"></canvas>
+    </div>
+    <div id="collectionStats" class="mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="h5">Pack Type 1 Statistics</h3>
+                <div class="result-item d-flex justify-content-between">
+                    <span>10th Percentile:</span>
+                    <span id="p10Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>20th Percentile:</span>
+                    <span id="p20Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>30th Percentile:</span>
+                    <span id="p30Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>40th Percentile:</span>
+                    <span id="p40Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>50th Percentile (Median):</span>
+                    <span id="p50Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>60th Percentile:</span>
+                    <span id="p60Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>70th Percentile:</span>
+                    <span id="p70Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>80th Percentile:</span>
+                    <span id="p80Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>90th Percentile:</span>
+                    <span id="p90Packs1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Average:</span>
+                    <span id="avgPacks1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Minimum:</span>
+                    <span id="minPacks1">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Maximum:</span>
+                    <span id="maxPacks1">-</span>
+                </div>
+            </div>
+            <div class="col-md-6" id="stats2Container" style="display: none;">
+                <h3 class="h5">Pack Type 2 Statistics</h3>
+                <div class="result-item d-flex justify-content-between">
+                    <span>10th Percentile:</span>
+                    <span id="p10Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>20th Percentile:</span>
+                    <span id="p20Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>30th Percentile:</span>
+                    <span id="p30Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>40th Percentile:</span>
+                    <span id="p40Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>50th Percentile (Median):</span>
+                    <span id="p50Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>60th Percentile:</span>
+                    <span id="p60Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>70th Percentile:</span>
+                    <span id="p70Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>80th Percentile:</span>
+                    <span id="p80Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>90th Percentile:</span>
+                    <span id="p90Packs2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Average:</span>
+                    <span id="avgPacks2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Minimum:</span>
+                    <span id="minPacks2">-</span>
+                </div>
+                <div class="result-item d-flex justify-content-between">
+                    <span>Maximum:</span>
+                    <span id="maxPacks2">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

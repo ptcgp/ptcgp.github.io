@@ -13,7 +13,7 @@ export const PACK_TYPES = [
   { value: 'a3b', label: 'A3b Eevee Grove' },
   { value: 'a4_hooh', label: 'A4 Wisdom of Sea and Sky: Ho-Oh' },
   { value: 'a4_lugia', label: 'A4 Wisdom of Sea and Sky: Lugia' },
-  { value: 'a4a', label: 'A4 Secluded Springs' },
+  { value: 'a4a', label: 'A4a Secluded Springs' },
   { value: 'a4b', label: 'A4b Deluxe Pack: ex' },
 
 ];

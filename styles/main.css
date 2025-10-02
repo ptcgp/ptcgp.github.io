@@ -1,0 +1,130 @@
+/* Main CSS for Pokemon TCG Pocket Simulator */
+
+.results-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.result-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+#collectionChart {
+    height: 500px !important;
+    max-height: 500px;
+}
+
+.loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.loading::after {
+    content: attr(data-progress);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+    color: #6c757d;
+}
+
+.progress {
+    display: none;
+}
+
+.loading .progress {
+    display: block;
+    margin-top: 20px;
+}
+
+/* Custom styling for evolve simulator */
+.btn-group .btn {
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.form-control-lg {
+    border-radius: 8px;
+}
+
+.btn-lg {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.badge {
+    border-radius: 20px;
+}
+
+/* Multi-Run Statistics Table Alignment */
+#multiRunStats .table th,
+#multiRunStats .table td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#multiRunStats .table th:first-child,
+#multiRunStats .table td:first-child {
+    text-align: left;
+}
+
+#multiRunStats .table th:nth-child(n+2),
+#multiRunStats .table td:nth-child(n+2) {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    min-width: 80px;
+}
+
+/* Ensure consistent column widths */
+#multiRunStats .table {
+    table-layout: fixed;
+}
+
+#multiRunStats .table th:nth-child(1),
+#multiRunStats .table td:nth-child(1) {
+    width: 25%;
+}
+
+#multiRunStats .table th:nth-child(2),
+#multiRunStats .table td:nth-child(2) {
+    width: 20%;
+}
+
+#multiRunStats .table th:nth-child(3),
+#multiRunStats .table td:nth-child(3) {
+    width: 15%;
+}
+
+#multiRunStats .table th:nth-child(4),
+#multiRunStats .table td:nth-child(4) {
+    width: 15%;
+}
+
+#multiRunStats .table th:nth-child(5),
+#multiRunStats .table td:nth-child(5) {
+    width: 25%;
+}
