@@ -9,7 +9,11 @@ export function updateDeckComposition() {
   const professorCount = parseInt($('input[name="professorCount"]:checked').val());
   const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
   const rareCandyCount = parseInt($('input[name="rareCandyCount"]:checked').val());
-  const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount + rareCandyCount;
+  const communicationCount = parseInt($('input[name="communicationCount"]:checked').val());
+  const otherBasicCount = parseInt($('input[name="otherBasicCount"]:checked').val());
+  const otherStage1Count = parseInt($('input[name="otherStage1Count"]:checked').val());
+  const otherStage2Count = parseInt($('input[name="otherStage2Count"]:checked').val());
+  const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount + rareCandyCount + communicationCount + otherBasicCount + otherStage1Count + otherStage2Count;
   const remainingCards = 20 - totalCards;
   
   $('#deckComposition').html(`
@@ -59,7 +63,31 @@ export function updateDeckComposition() {
           </div>
           <div class="col-md-2 col-6">
             <div class="text-center">
-              <div class="h4 text-secondary mb-1">${remainingCards}</div>
+              <div class="h4 text-warning mb-1">${communicationCount}</div>
+              <div class="small text-muted">Pokémon Communication</div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="text-center">
+              <div class="h4 text-primary mb-1">${otherBasicCount}</div>
+              <div class="small text-muted">Other Basic</div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="text-center">
+              <div class="h4 text-success mb-1">${otherStage1Count}</div>
+              <div class="small text-muted">Other Stage 1</div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="text-center">
+              <div class="h4 text-warning mb-1">${otherStage2Count}</div>
+              <div class="small text-muted">Other Stage 2</div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="text-center">
+              <div class="h4 text-muted mb-1">${remainingCards}</div>
               <div class="small text-muted">Other Cards</div>
             </div>
           </div>
@@ -76,41 +104,68 @@ export function updateDeckComposition() {
 // Initialize UI event handlers
 export function initializeEvolveUI() {
   // Update deck composition on input changes
-  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"], input[name="professorCount"], input[name="pokeballCount"], input[name="rareCandyCount"]').on('change', updateDeckComposition);
+  $('input[name="basicCount"], input[name="stage1Count"], input[name="stage2Count"], input[name="professorCount"], input[name="pokeballCount"], input[name="rareCandyCount"], input[name="communicationCount"], input[name="otherBasicCount"], input[name="otherStage1Count"], input[name="otherStage2Count"]').on('change', updateDeckComposition);
   updateDeckComposition(); // Initial update
 
   // Preset configurations
-  // Format: Basic-Stage1-Stage2-Professor-Pokeball-RareCandy
+  // Format: Basic-Stage1-Stage2-Professor-Pokeball-RareCandy-Communication-OtherBasic-OtherStage1-OtherStage2
   $('#presetBalanced').on('click', function() {
-    // Full Support (2-2-2-2-2-2)
+    // Full Support (2-2-2-2-2-2-2-2)
     $('#basic2').prop('checked', true);
     $('#stage1_2').prop('checked', true);
     $('#stage2_2').prop('checked', true);
     $('#professor_2').prop('checked', true);
     $('#pokeball_2').prop('checked', true);
     $('#rarecandy_2').prop('checked', true);
+    $('#communication_2').prop('checked', true);
+    $('#otherBasic_2').prop('checked', true);
+    $('#otherStage1_2').prop('checked', true);
+    $('#otherStage2_2').prop('checked', true);
     updateDeckComposition();
   });
 
   $('#presetHeavy').on('click', function() {
-    // No Stage 1 (2-0-2-2-2-2)
-    $('#basic2').prop('checked', true);
-    $('#stage1_0').prop('checked', true);
-    $('#stage2_2').prop('checked', true);
-    $('#professor_2').prop('checked', true);
-    $('#pokeball_2').prop('checked', true);
-    $('#rarecandy_2').prop('checked', true);
-    updateDeckComposition();
-  });
-
-  $('#presetLight').on('click', function() {
-    // Min Stage 1 (2-1-2-2-2-2)
+    // Min Stage 1 (2-1-2-2-2-2-2-2)
     $('#basic2').prop('checked', true);
     $('#stage1_1').prop('checked', true);
     $('#stage2_2').prop('checked', true);
     $('#professor_2').prop('checked', true);
     $('#pokeball_2').prop('checked', true);
     $('#rarecandy_2').prop('checked', true);
+    $('#communication_2').prop('checked', true);
+    $('#otherBasic_2').prop('checked', true);
+    $('#otherStage1_2').prop('checked', true);
+    $('#otherStage2_2').prop('checked', true);
+    updateDeckComposition();
+  });
+
+  $('#presetLight').on('click', function() {
+    // No Stage 1 (2-0-2-2-2-2-2-2)
+    $('#basic2').prop('checked', true);
+    $('#stage1_0').prop('checked', true);
+    $('#stage2_2').prop('checked', true);
+    $('#professor_2').prop('checked', true);
+    $('#pokeball_2').prop('checked', true);
+    $('#rarecandy_2').prop('checked', true);
+    $('#communication_2').prop('checked', true);
+    $('#otherBasic_2').prop('checked', true);
+    $('#otherStage1_2').prop('checked', true);
+    $('#otherStage2_2').prop('checked', true);
+    updateDeckComposition();
+  });
+
+  $('#presetMinimal').on('click', function() {
+    // Minimal (2-2-2-0-0-0-0)
+    $('#basic2').prop('checked', true);
+    $('#stage1_2').prop('checked', true);
+    $('#stage2_2').prop('checked', true);
+    $('#professor_0').prop('checked', true);
+    $('#pokeball_0').prop('checked', true);
+    $('#rarecandy_0').prop('checked', true);
+    $('#communication_0').prop('checked', true);
+    $('#otherBasic_0').prop('checked', true);
+    $('#otherStage1_0').prop('checked', true);
+    $('#otherStage2_0').prop('checked', true);
     updateDeckComposition();
   });
 }

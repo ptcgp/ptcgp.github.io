@@ -17,11 +17,15 @@ export function initializeEvolveSimulator() {
           const basicCount = parseInt($('input[name="basicCount"]:checked').val());
           const stage1Count = parseInt($('input[name="stage1Count"]:checked').val());
           const stage2Count = parseInt($('input[name="stage2Count"]:checked').val());
-    const cyrusCount = 0; // Cyrus removed from options
-    const professorCount = parseInt($('input[name="professorCount"]:checked').val());
-    const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
-    const rareCandyCount = parseInt($('input[name="rareCandyCount"]:checked').val());
-    const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());
+          const cyrusCount = 0; // Cyrus removed from options
+          const professorCount = parseInt($('input[name="professorCount"]:checked').val());
+          const pokeballCount = parseInt($('input[name="pokeballCount"]:checked').val());
+          const rareCandyCount = parseInt($('input[name="rareCandyCount"]:checked').val());
+          const communicationCount = parseInt($('input[name="communicationCount"]:checked').val());
+          const otherBasicCount = parseInt($('input[name="otherBasicCount"]:checked').val());
+          const otherStage1Count = parseInt($('input[name="otherStage1Count"]:checked').val());
+          const otherStage2Count = parseInt($('input[name="otherStage2Count"]:checked').val());
+          const targetStage2Count = parseInt($('input[name="targetStage2Count"]:checked').val());
           const simulationRuns = parseInt($('#simulationRuns').val()) || 10000;
           const debugMode = $('#debugMode').is(':checked');
     const $chartContainer = $('#evolveChartContainer');
@@ -38,6 +42,10 @@ export function initializeEvolveSimulator() {
       professorCount,
       pokeballCount,
       rareCandyCount,
+      communicationCount,
+      otherBasicCount,
+      otherStage1Count,
+      otherStage2Count,
       targetStage2Count,
       timestamp: new Date().toLocaleTimeString()
     };
@@ -46,7 +54,7 @@ export function initializeEvolveSimulator() {
     simulationCount++;
 
     // Validate deck composition
-    const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount + rareCandyCount;
+    const totalCards = basicCount + stage1Count + stage2Count + cyrusCount + professorCount + pokeballCount + rareCandyCount + communicationCount;
     if (totalCards > 20) {
       alert('Error: Total cards cannot exceed 20. Current total: ' + totalCards);
       return;
@@ -79,7 +87,7 @@ export function initializeEvolveSimulator() {
       };
       
       // Run single simulation with debug
-      const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, targetStage2Count, true);
+      const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, communicationCount, otherBasicCount, otherStage1Count, otherStage2Count, targetStage2Count, true);
       
       // Restore console.log
       console.log = originalLog;
@@ -91,7 +99,7 @@ export function initializeEvolveSimulator() {
       if (result !== -1) {
         $debugSteps.append(`<div class="alert alert-success mt-3"><strong>SUCCESS!</strong> Stage 2 evolution achieved on turn ${result}</div>`);
       } else {
-        $debugSteps.append(`<div class="alert alert-danger mt-3"><strong>FAILED!</strong> No Stage 2 evolution achieved within 50 turns</div>`);
+        $debugSteps.append(`<div class="alert alert-danger mt-3"><strong>FAILED!</strong> No Stage 2 evolution achieved within 100 turns</div>`);
       }
       
       return;
@@ -111,7 +119,7 @@ export function initializeEvolveSimulator() {
 
       function processBatch() {
         for (let i = 0; i < batchSize && processed < totalTrials; i++) {
-          const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, targetStage2Count);
+          const result = simulateEvolution(null, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, communicationCount, otherBasicCount, otherStage1Count, otherStage2Count, targetStage2Count);
           // Only include successful evolutions (not -1)
           if (result !== -1) {
             results.push(result);

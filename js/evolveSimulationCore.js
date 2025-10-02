@@ -1,5 +1,5 @@
 // Core simulation logic for Pokemon evolution
-export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, targetStage2Count, debugMode = false) {
+export function simulateEvolution(packType, basicCount, stage1Count, stage2Count, cyrusCount, professorCount, pokeballCount, rareCandyCount, communicationCount, otherBasicCount, otherStage1Count, otherStage2Count, targetStage2Count, debugMode = false) {
   // Create a deck of 20 cards with each card type appearing max twice
   const deck = [];
   
@@ -33,6 +33,22 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   // Add Rare Candy cards
   for (let i = 0; i < rareCandyCount; i++) {
     deck.push({ type: 'rarecandy', name: 'Rare Candy' });
+  }
+  
+  // Add Pokémon Communication cards
+  for (let i = 0; i < communicationCount; i++) {
+    deck.push({ type: 'communication', name: 'Pokémon Communication' });
+  }
+  
+  // Add Other Pokemon cards (these are NOT part of the evolution chain)
+  for (let i = 0; i < otherBasicCount; i++) {
+    deck.push({ type: 'otherbasic', name: 'Other Basic' });
+  }
+  for (let i = 0; i < otherStage1Count; i++) {
+    deck.push({ type: 'otherstage1', name: 'Other Stage 1' });
+  }
+  for (let i = 0; i < otherStage2Count; i++) {
+    deck.push({ type: 'otherstage2', name: 'Other Stage 2' });
   }
   
   // Fill remaining slots with other cards (energy, trainers, etc.)
@@ -72,14 +88,18 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
   const initialDraw = deck.splice(0, 5);
   hand = [...initialDraw];
   
-  // Ensure at least 1 Basic Pokemon in hand
-  const basicInHand = hand.some(card => card.type === 'basic');
-  if (!basicInHand) {
-    // If no Basic in hand, replace a random card with a Basic
+  // Ensure at least 1 Basic Pokemon OR Other Basic in hand
+  const basicOrOtherBasicInHand = hand.some(card => card.type === 'basic' || card.type === 'otherbasic');
+  if (!basicOrOtherBasicInHand) {
+    // If no Basic or Other Basic in hand, replace a random card with a Basic or Other Basic
     const basicIndex = deck.findIndex(card => card.type === 'basic');
-    if (basicIndex !== -1) {
+    const otherBasicIndex = deck.findIndex(card => card.type === 'otherbasic');
+    
+    // Prefer Basic over Other Basic
+    const targetIndex = basicIndex !== -1 ? basicIndex : otherBasicIndex;
+    if (targetIndex !== -1) {
       const randomIndex = Math.floor(Math.random() * hand.length);
-      hand[randomIndex] = deck.splice(basicIndex, 1)[0];
+      hand[randomIndex] = deck.splice(targetIndex, 1)[0];
     }
   }
   
@@ -120,7 +140,7 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     
     // Each turn: can play multiple Item cards (Poké Ball) - Use strategically
     let pokeballsInHand = hand.filter(card => card.type === 'pokeball');
-    const basicsInHand = hand.filter(card => card.type === 'basic');
+    const basicsInHand = hand.filter(card => card.type === 'basic' || card.type === 'otherbasic');
     
     if (debugMode) {
       console.log('Poké Balls in hand:', pokeballsInHand.length);
@@ -132,19 +152,19 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     if (basicsInHand.length < 2) {
       for (const pokeball of pokeballsInHand) {
         hand = hand.filter(card => card !== pokeball);
-        // Poké Ball: Draw a Basic Pokemon from deck if any
-        const basicInDeck = deck.findIndex(card => card.type === 'basic');
-        if (basicInDeck !== -1) {
-          const basicCard = deck.splice(basicInDeck, 1)[0];
-          hand.push(basicCard);
-          if (debugMode) {
-            console.log('Poké Ball found Basic:', basicCard.type);
+          // Poké Ball: Draw a Basic Pokemon (basic or otherbasic) from deck if any
+          const basicInDeck = deck.findIndex(card => card.type === 'basic' || card.type === 'otherbasic');
+          if (basicInDeck !== -1) {
+            const basicCard = deck.splice(basicInDeck, 1)[0];
+            hand.push(basicCard);
+            if (debugMode) {
+              console.log('Poké Ball found Basic:', basicCard.type);
+            }
+          } else {
+            if (debugMode) {
+              console.log('Poké Ball found no Basic in deck');
+            }
           }
-        } else {
-          if (debugMode) {
-            console.log('Poké Ball found no Basic in deck');
-          }
-        }
         // Even if no Basic Pokemon found, Poké Ball still thins the deck
         // This increases the chance of drawing Stage 1/Stage 2 cards
       }
@@ -186,6 +206,103 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       }
     }
     
+    // Each turn: can play multiple Item cards (Pokémon Communication) - Use strategically
+    let communicationsInHand = hand.filter(card => card.type === 'communication');
+    
+    if (debugMode) {
+      console.log('Pokémon Communications in hand:', communicationsInHand.length);
+    }
+    
+    // Use Pokémon Communication strategically to find the right evolution pieces
+    // Only use when we can evolve but don't have the right card, AND we're not in the same turn as playing Basic
+    if (communicationsInHand.length > 0 && !basicPlayedThisTurn && turns > 1) {
+      for (const communication of communicationsInHand) {
+        hand = hand.filter(card => card !== communication);
+        
+        // Strategic use cases for Pokémon Communication:
+        // 1. Field has Basic, hand has Stage 1 but need Stage 2 -> put back Stage 1, search for Stage 2
+        // 2. Field has Basic, hand has Stage 2 but need Stage 1 -> put back Stage 2, search for Stage 1  
+        // 3. Field has Stage 1, hand has Basic/Stage 1 but need Stage 2 -> put back Basic/Stage 1, search for Stage 2
+        
+        const hasBasicInField = field.some(pokemon => pokemon.type === 'basic' || pokemon.type === 'otherbasic');
+        const hasStage1InField = field.some(pokemon => pokemon.type === 'stage1');
+        const stage1InHand = hand.find(card => card.type === 'stage1');
+        const stage2InHand = hand.find(card => card.type === 'stage2');
+        const basicInHand = hand.find(card => card.type === 'basic' || card.type === 'otherbasic');
+        
+        let cardToPutBack = null;
+        
+        if (hasBasicInField && stage1InHand && !stage2InHand) {
+          // Case 1: Field has Basic, hand has Stage 1, need Stage 2
+          // DON'T use Communication - we can evolve Basic to Stage 1 this turn
+          if (debugMode) {
+            console.log('Pokémon Communication: Can evolve Basic to Stage 1, not using');
+          }
+        } else if (hasBasicInField && stage2InHand && !stage1InHand) {
+          // Case 2: Field has Basic, hand has Stage 2, need Stage 1
+          cardToPutBack = stage2InHand;
+        } else if (hasStage1InField && (basicInHand || stage1InHand) && !stage2InHand) {
+          // Case 3: Field has Stage 1, hand has Basic/Stage 1, need Stage 2
+          cardToPutBack = basicInHand || stage1InHand;
+        } else if (hasBasicInField && !stage1InHand && !stage2InHand) {
+          // Case 4: Field has Basic, no evolution cards in hand, search for any Pokémon card
+          const nonEssentialCard = hand.find(card => card.type === 'otherbasic' || card.type === 'otherstage1' || card.type === 'otherstage2');
+          if (nonEssentialCard) {
+            cardToPutBack = nonEssentialCard;
+          }
+        } else if (hasStage1InField && !stage2InHand) {
+          // Case 5: Field has Stage 1, no Stage 2 in hand, search for any Pokémon card
+          const nonEssentialCard = hand.find(card => card.type === 'otherbasic' || card.type === 'otherstage1' || card.type === 'otherstage2');
+          if (nonEssentialCard) {
+            cardToPutBack = nonEssentialCard;
+          }
+        }
+        
+        if (cardToPutBack) {
+          // Put the card back into deck
+          hand = hand.filter(card => card !== cardToPutBack);
+          deck.push(cardToPutBack);
+          
+          // Search for any Pokémon card (basic, stage1, stage2, otherbasic, otherstage1, otherstage2)
+          const pokemonCardTypes = ['basic', 'stage1', 'stage2', 'otherbasic', 'otherstage1', 'otherstage2'];
+          const pokemonCardsInDeck = deck.filter(card => pokemonCardTypes.includes(card.type));
+          
+          if (pokemonCardsInDeck.length > 0) {
+            // Draw a random Pokémon card from the deck
+            const randomIndex = Math.floor(Math.random() * pokemonCardsInDeck.length);
+            const targetCard = pokemonCardsInDeck[randomIndex];
+            const targetCardIndex = deck.findIndex(card => card === targetCard);
+            const drawnCard = deck.splice(targetCardIndex, 1)[0];
+            hand.push(drawnCard);
+            if (debugMode) {
+              console.log(`Pokémon Communication: Put back ${cardToPutBack.type}, found ${drawnCard.type}`);
+            }
+          } else {
+            // If no Pokémon cards in deck, draw a random card
+            if (deck.length > 0) {
+              const randomIndex = Math.floor(Math.random() * deck.length);
+              const randomCard = deck.splice(randomIndex, 1)[0];
+              hand.push(randomCard);
+              if (debugMode) {
+                console.log(`Pokémon Communication: Put back ${cardToPutBack.type}, drew random ${randomCard.type}`);
+              }
+            }
+          }
+        } else {
+          // No strategic use case, don't use Pokémon Communication
+          // Put the communication card back in hand
+          hand.push(communication);
+          if (debugMode) {
+            console.log('Pokémon Communication: No strategic use case, keeping card');
+          }
+        }
+      }
+    } else if (communicationsInHand.length > 0) {
+      if (debugMode) {
+        console.log('Pokémon Communication: Not using - Basic played this turn or Turn 1');
+      }
+    }
+    
     // Each turn: can play 1 Supporter card (Professor's Research)
     const professorInHand = hand.find(card => card.type === 'professor');
     
@@ -208,13 +325,13 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
       
       // After Professor's Research, check for new Poké Balls that were drawn
       // Use Poké Ball if we have fewer than 2 Basic Pokemon (same logic as before)
-      const basicsInHandAfterProfessor = hand.filter(card => card.type === 'basic');
+      const basicsInHandAfterProfessor = hand.filter(card => card.type === 'basic' || card.type === 'otherbasic');
       if (basicsInHandAfterProfessor.length < 2) {
         pokeballsInHand = hand.filter(card => card.type === 'pokeball');
         for (const pokeball of pokeballsInHand) {
           hand = hand.filter(card => card !== pokeball);
-          // Poké Ball: Draw a Basic Pokemon from deck if any
-          const basicInDeck = deck.findIndex(card => card.type === 'basic');
+          // Poké Ball: Draw a Basic Pokemon (basic or otherbasic) from deck if any
+          const basicInDeck = deck.findIndex(card => card.type === 'basic' || card.type === 'otherbasic');
           if (basicInDeck !== -1) {
             const basicCard = deck.splice(basicInDeck, 1)[0];
             hand.push(basicCard);
@@ -271,7 +388,7 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     if (debugMode) {
       console.log('Stage 1 in hand:', stage1InHand ? 'Yes' : 'No');
       console.log('Stage 2 in hand:', stage2InHand ? 'Yes' : 'No');
-      console.log('Field has Basic:', field.some(p => p.type === 'basic'));
+      console.log('Field has Basic:', field.some(p => p.type === 'basic' || p.type === 'otherbasic'));
       console.log('Field has Stage 1:', field.some(p => p.type === 'stage1'));
       console.log('Basic played this turn:', basicPlayedThisTurn);
       console.log('Turns > 1:', turns > 1);
@@ -319,9 +436,9 @@ export function simulateEvolution(packType, basicCount, stage1Count, stage2Count
     }
     
     // Prevent infinite loops
-    if (turns > 50) {
+    if (turns > 100) {
       if (debugMode) {
-        console.log('Breaking after 50 turns');
+        console.log('Breaking after 100 turns');
       }
       break;
     }

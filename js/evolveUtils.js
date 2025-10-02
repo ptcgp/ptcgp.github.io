@@ -6,6 +6,7 @@ export function getSupporterInfo(config) {
   const professorCount = config.professorCount || 0;
   const pokeballCount = config.pokeballCount || 0;
   const rareCandyCount = config.rareCandyCount || 0;
+  const communicationCount = config.communicationCount || 0;
   
   let supporterText = '';
   const parts = [];
@@ -14,6 +15,7 @@ export function getSupporterInfo(config) {
   if (professorCount > 0) parts.push(`Professor: ${professorCount}`);
   if (pokeballCount > 0) parts.push(`Poké Ball: ${pokeballCount}`);
   if (rareCandyCount > 0) parts.push(`Rare Candy: ${rareCandyCount}`);
+  if (communicationCount > 0) parts.push(`Communication: ${communicationCount}`);
   
   if (parts.length > 0) {
     supporterText = parts.join(', ');
