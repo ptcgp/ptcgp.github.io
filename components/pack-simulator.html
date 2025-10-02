@@ -39,11 +39,11 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6" id="pack1Results">
+        <div class="col-lg-6 col-12" id="pack1Results">
             <h3 class="h5 mb-3">Pack Type 1 Results</h3>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
+            <div class="table-responsive table-responsive-sm">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-dark">
                         <tr>
                             <th>Rarity</th>
                             <th>Cards</th>
@@ -52,21 +52,21 @@
                         </tr>
                     </thead>
                     <tbody id="cardDistributionTable1"></tbody>
-                    <tfoot>
-                        <tr class="table-secondary">
-                            <td colspan="2">Total</td>
-                            <td id="totalCards1"></td>
-                            <td>100%</td>
+                    <tfoot class="table-secondary">
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td id="totalCards1"><strong>-</strong></td>
+                            <td><strong>100%</strong></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-        <div class="col-md-6" id="pack2Results" style="display: none;">
+        <div class="col-lg-6 col-12" id="pack2Results" style="display: none;">
             <h3 class="h5 mb-3">Pack Type 2 Results</h3>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
+            <div class="table-responsive table-responsive-sm">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-dark">
                         <tr>
                             <th>Rarity</th>
                             <th>Cards</th>
@@ -75,11 +75,11 @@
                         </tr>
                     </thead>
                     <tbody id="cardDistributionTable2"></tbody>
-                    <tfoot>
-                        <tr class="table-secondary">
-                            <td colspan="2">Total</td>
-                            <td id="totalCards2"></td>
-                            <td>100%</td>
+                    <tfoot class="table-secondary">
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td id="totalCards2"><strong>-</strong></td>
+                            <td><strong>100%</strong></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -91,34 +91,34 @@
     <div class="mt-4" id="multiRunStats" style="display: none;">
         <h3 class="h5 mb-3">Multi-Run Statistics</h3>
         <div class="row" id="multiRunStatsContainer">
-            <div class="col-md-6" id="multiRunStats1">
-                <h4 class="h6">Pack Type 1 - Rarity Distribution Across All Runs</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
+            <div class="col-lg-6 col-12" id="multiRunStats1">
+                <h4 class="h6 mb-2">Pack Type 1 - Rarity Distribution Across All Runs</h4>
+                <div class="table-responsive table-responsive-sm">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead class="table-dark">
                             <tr>
                                 <th class="text-start">Rarity</th>
-                                <th class="text-end">Avg per Run</th>
-                                <th class="text-end">Min per Run</th>
-                                <th class="text-end">Max per Run</th>
-                                <th class="text-end">Standard Deviation</th>
+                                <th class="text-end">Avg</th>
+                                <th class="text-end">Min</th>
+                                <th class="text-end">Max</th>
+                                <th class="text-end">Std Dev</th>
                             </tr>
                         </thead>
                         <tbody id="multiRunTable1"></tbody>
                     </table>
                 </div>
             </div>
-            <div class="col-md-6" id="multiRunStats2" style="display: none;">
-                <h4 class="h6">Pack Type 2 - Rarity Distribution Across All Runs</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
+            <div class="col-lg-6 col-12" id="multiRunStats2" style="display: none;">
+                <h4 class="h6 mb-2">Pack Type 2 - Rarity Distribution Across All Runs</h4>
+                <div class="table-responsive table-responsive-sm">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead class="table-dark">
                             <tr>
                                 <th class="text-start">Rarity</th>
-                                <th class="text-end">Avg per Run</th>
-                                <th class="text-end">Min per Run</th>
-                                <th class="text-end">Max per Run</th>
-                                <th class="text-end">Standard Deviation</th>
+                                <th class="text-end">Avg</th>
+                                <th class="text-end">Min</th>
+                                <th class="text-end">Max</th>
+                                <th class="text-end">Std Dev</th>
                             </tr>
                         </thead>
                         <tbody id="multiRunTable2"></tbody>
