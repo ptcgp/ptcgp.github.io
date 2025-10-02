@@ -1,0 +1,458 @@
+import { RARITIES, RARITY_SYMBOLS, PACK_CARD_COUNTS_ARRAY, gold_price } from './constants.js';
+import { DRAW_RATES, DRAW_RATES_TYPED } from './drawRates.js';
+import { simulatePackOpening, simulateCollection, simulateSpecificCard } from './simulator.js';
+import { updateCollectionChart, updateSpecificChart } from './charts.js';
+import { findOptimalGoldPackage, calculateOptimalGoldPurchase } from './goldCalculator.js';
+import { PACK_TYPES } from './packTypes.js';
+
+// Function to populate all pack type dropdowns
+function populatePackTypeDropdowns() {
+  const dropdownIds = [
+    'packType',
+    'packType2',
+    'collectionPackType1', 
+    'collectionPackType2',
+    'specificPackType1',
+    'specificPackType2'
+  ];
+
+  dropdownIds.forEach(dropdownId => {
+    const $dropdown = $(`#${dropdownId}`);
+    const currentValue = $dropdown.val();
+    
+    // Clear existing options
+    $dropdown.empty();
+    
+    // Add "None" option for optional dropdowns
+    if (dropdownId === 'packType2' || dropdownId === 'collectionPackType2' || dropdownId === 'specificPackType2') {
+      $dropdown.append('<option value="">None</option>');
+    }
+    
+    // Add options from PACK_TYPES
+    PACK_TYPES.forEach(packType => {
+      const $option = $(`<option value="${packType.value}">${packType.label}</option>`);
+      $dropdown.append($option);
+    });
+    
+    // Restore previous value if it exists
+    if (currentValue && (PACK_TYPES.some(p => p.value === currentValue) || currentValue === '')) {
+      $dropdown.val(currentValue);
+    }
+  });
+}
+
+export function initializePackSimulator() {
+  // Populate dropdown on initialization
+  populatePackTypeDropdowns();
+  $('#simulateBtn').on('click', function() {
+    const packType1 = $('#packType').val();
+    const packType2 = $('#packType2').val();
+    const packCount = parseInt($('#packCount').val());
+    const $error = $('#error');
+
+    if (isNaN(packCount) || packCount < 1 || packCount > 100000) {
+      $error.removeClass('d-none');
+      return;
+    }
+    $error.addClass('d-none');
+
+    // Simulate first pack type
+    const packTypeCounts1 = {};
+    const results1 = new Array(RARITY_SYMBOLS.length).fill(0);
+    const packRates1 = DRAW_RATES_TYPED[packType1]?.pack_rates || [[0.9995, "regular"], [0.0005, "rare"]];
+
+    for (let i = 0; i < packCount; i++) {
+      const random = Math.random();
+      let cumulative = 0;
+      let selectedPackType = "regular";
+      for (const [rate, packTypeName] of packRates1) {
+        cumulative += rate;
+        if (random < cumulative) {
+          selectedPackType = packTypeName;
+          break;
+        }
+      }
+
+      packTypeCounts1[selectedPackType] = (packTypeCounts1[selectedPackType] || 0) + 1;
+
+      const isGodPack = selectedPackType === "rare";
+      const isBabyPack = selectedPackType === "baby";
+      const packResults = simulatePackOpening(packType1, isGodPack, isBabyPack);
+      for (let j = 0; j < results1.length; j++) {
+        results1[j] += packResults.counts[j];
+      }
+    }
+
+    // Simulate second pack type if selected
+    let packTypeCounts2 = {};
+    let results2 = new Array(RARITY_SYMBOLS.length).fill(0);
+    if (packType2) {
+      const packRates2 = DRAW_RATES_TYPED[packType2]?.pack_rates || [[0.9995, "regular"], [0.0005, "rare"]];
+
+      for (let i = 0; i < packCount; i++) {
+        const random = Math.random();
+        let cumulative = 0;
+        let selectedPackType = "regular";
+        for (const [rate, packTypeName] of packRates2) {
+          cumulative += rate;
+          if (random < cumulative) {
+            selectedPackType = packTypeName;
+            break;
+          }
+        }
+
+        packTypeCounts2[selectedPackType] = (packTypeCounts2[selectedPackType] || 0) + 1;
+
+        const isGodPack = selectedPackType === "rare";
+        const isBabyPack = selectedPackType === "baby";
+        const packResults = simulatePackOpening(packType2, isGodPack, isBabyPack);
+        for (let j = 0; j < results2.length; j++) {
+          results2[j] += packResults.counts[j];
+        }
+      }
+    }
+
+    // Show pack distribution
+    let packDistHtml = '';
+    for (const [packTypeName, count] of Object.entries(packTypeCounts1)) {
+      const percentage = ((count / packCount) * 100).toFixed(2);
+      let displayName;
+      if (packTypeName === "rare") {
+        displayName = "God Packs";
+      } else if (packTypeName === "baby") {
+        displayName = "Baby Packs";
+      } else {
+        displayName = packTypeName.charAt(0).toUpperCase() + packTypeName.slice(1) + ' Packs';
+      }
+      packDistHtml += `
+        <div class="result-item d-flex justify-content-between">
+          <span>${displayName}:</span>
+          <span>${count} (${percentage}%)</span>
+        </div>
+      `;
+    }
+    $('#packResults').html(packDistHtml);
+
+    // Show/hide second pack results and adjust column widths
+    if (packType2) {
+      $('#pack2Results').show();
+      $('#pack1Results').removeClass('col-md-12').addClass('col-md-6');
+    } else {
+      $('#pack2Results').hide();
+      $('#pack1Results').removeClass('col-md-6').addClass('col-md-12');
+    }
+
+    // Calculate and show card distribution for pack 1
+    const cardCounts1 = PACK_CARD_COUNTS_ARRAY[packType1];
+    const totalCards1 = results1.reduce((a, b) => a + b, 0);
+
+    // Get all rarities that have cards in either pack for alignment
+    const allRarities = [];
+    for (let i = 0; i < RARITIES.length; i++) {
+      const hasCards1 = cardCounts1[i] > 0;
+      const hasCards2 = packType2 ? PACK_CARD_COUNTS_ARRAY[packType2][i] > 0 : false;
+      if (hasCards1 || hasCards2) {
+        allRarities.push(i);
+      }
+    }
+
+    const tableRows1 = allRarities.map(index => {
+      const count = cardCounts1[index] || 0;
+      const pulled = results1[index] || 0;
+      const pullRate = totalCards1 > 0 ? (pulled / totalCards1 * 100).toFixed(2) : '0.00';
+      return `
+        <tr>
+          <td>${RARITIES[index].name}</td>
+          <td>${count}</td>
+          <td>${pulled}</td>
+          <td>${pullRate}%</td>
+        </tr>
+      `;
+    }).join('');
+
+    $('#cardDistributionTable1').html(tableRows1);
+    $('#totalCards1').text(totalCards1);
+
+    // Calculate and show card distribution for pack 2 if selected
+    if (packType2) {
+      const cardCounts2 = PACK_CARD_COUNTS_ARRAY[packType2];
+      const totalCards2 = results2.reduce((a, b) => a + b, 0);
+
+      const tableRows2 = allRarities.map(index => {
+        const count = cardCounts2[index] || 0;
+        const pulled = results2[index] || 0;
+        const pullRate = totalCards2 > 0 ? (pulled / totalCards2 * 100).toFixed(2) : '0.00';
+        return `
+          <tr>
+            <td>${RARITIES[index].name}</td>
+            <td>${count}</td>
+            <td>${pulled}</td>
+            <td>${pullRate}%</td>
+          </tr>
+        `;
+      }).join('');
+
+      $('#cardDistributionTable2').html(tableRows2);
+      $('#totalCards2').text(totalCards2);
+    }
+  });
+}
+
+export function initializeCollectionSimulator() {
+  // Populate dropdown on initialization
+  populatePackTypeDropdowns();
+  
+  $('#simulateCollectionBtn').on('click', function() {
+    const packType1 = $('#collectionPackType1').val();
+    const packType2 = $('#collectionPackType2').val();
+    const excludeRareCards = $('#excludeRareCards').is(':checked');
+    const needDouble = $('#doubleCollection').is(':checked');
+    const $chartContainer = $('#chartContainer');
+    const $progressBar = $('.progress-bar');
+    const $stats2Container = $('#stats2Container');
+
+    // Show loading state
+    $chartContainer.addClass('loading');
+    $chartContainer.attr('data-progress', 'Simulating... 0%');
+    $progressBar.css('width', '0%').attr('aria-valuenow', 0);
+
+    setTimeout(() => {
+      const results1 = [];
+      const results2 = [];
+      const totalTrials = 10000;
+      const batchSize = 50;
+      let processed = 0;
+
+      function processBatch() {
+        for (let i = 0; i < batchSize && processed < totalTrials; i++) {
+          results1.push(simulateCollection(packType1, excludeRareCards, needDouble));
+          if (packType2) {
+            results2.push(simulateCollection(packType2, excludeRareCards, needDouble));
+          }
+          processed++;
+        }
+
+        // Update progress
+        const progress = Math.round((processed / totalTrials) * 100);
+        $chartContainer.attr('data-progress', `Simulating... ${progress}%`);
+        $progressBar.css('width', `${progress}%`).attr('aria-valuenow', progress);
+
+        if (processed < totalTrials) {
+          setTimeout(processBatch, 0);
+        } else {
+          // Calculate statistics for pack type 1
+          const sortedResults1 = [...results1].sort((a, b) => a - b);
+          const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
+          const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
+          const min1 = Math.min(...results1);
+          const max1 = Math.max(...results1);
+
+          // Update pack type 1 statistics
+          $('#avgPacks1').text(avg1);
+          $('#medianPacks1').text(median1);
+          $('#minPacks1').text(min1);
+          $('#maxPacks1').text(max1);
+
+          if (packType2) {
+            // Calculate statistics for pack type 2
+            const sortedResults2 = [...results2].sort((a, b) => a - b);
+            const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
+            const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
+            const min2 = Math.min(...results2);
+            const max2 = Math.max(...results2);
+
+            // Update pack type 2 statistics
+            $('#avgPacks2').text(avg2);
+            $('#medianPacks2').text(median2);
+            $('#minPacks2').text(min2);
+            $('#maxPacks2').text(max2);
+            $stats2Container.show();
+          } else {
+            $stats2Container.hide();
+          }
+
+          // Remove loading state and update chart
+          $chartContainer.removeClass('loading');
+          updateCollectionChart(results1, packType1, results2, packType2);
+        }
+      }
+
+      // Start processing batches
+      processBatch();
+    }, 50);
+  });
+}
+
+export function initializeSpecificCardSimulator() {
+  // Populate dropdown on initialization
+  populatePackTypeDropdowns();
+  
+  function updateTargetRarityOptions() {
+    // Update first pack's rarities
+    const packType1 = $('#specificPackType1').val();
+    const cardCounts1 = PACK_CARD_COUNTS_ARRAY[packType1];
+    const $targetRarity1 = $('#targetRarity1');
+
+    $targetRarity1.empty();
+    cardCounts1.forEach((count, index) => {
+      if (count > 0) {
+        const optionText = `${RARITIES[index].name} (${count} different cards)`;
+        $targetRarity1.append(`<option value="${index}">${optionText}</option>`);
+      }
+    });
+
+    // Update second pack's rarities
+    const packType2 = $('#specificPackType2').val();
+    const $targetRarity2 = $('#targetRarity2');
+
+    if (packType2) {
+      const cardCounts2 = PACK_CARD_COUNTS_ARRAY[packType2];
+      $targetRarity2.empty();
+      cardCounts2.forEach((count, index) => {
+        if (count > 0) {
+          const optionText = `${RARITIES[index].name} (${count} different cards)`;
+          $targetRarity2.append(`<option value="${index}">${optionText}</option>`);
+        }
+      });
+      $targetRarity2.prop('disabled', false);
+    } else {
+      $targetRarity2.empty();
+      $targetRarity2.append('<option value="">Select Pack Type 2 first</option>');
+      $targetRarity2.prop('disabled', true);
+    }
+  }
+
+  // Initialize target rarity options
+  updateTargetRarityOptions();
+  $('#specificPackType1, #specificPackType2').on('change', updateTargetRarityOptions);
+
+  // Specific Card Simulator
+  $('#simulateSpecificBtn').on('click', function() {
+    const packType1 = $('#specificPackType1').val();
+    const targetRarity1 = parseInt($('#targetRarity1').val());
+    const packType2 = $('#specificPackType2').val();
+    const targetRarity2 = $('#targetRarity2').val() ? parseInt($('#targetRarity2').val()) : null;
+    const needDouble = $('#doubleSpecific').is(':checked');
+    const $chartContainer = $('#specificChartContainer');
+    const $progressBar = $chartContainer.find('.progress-bar');
+    const $stats2Container = $('#stats2ContainerSpecific');
+
+    // Show loading state
+    $chartContainer.addClass('loading');
+    $chartContainer.attr('data-progress', 'Simulating... 0%');
+    $progressBar.css('width', '0%').attr('aria-valuenow', 0);
+
+    setTimeout(() => {
+      const results1 = [];
+      const results2 = [];
+      const totalTrials = 10000;
+      const batchSize = 50;
+      let processed = 0;
+
+      function processBatch() {
+        for (let i = 0; i < batchSize && processed < totalTrials; i++) {
+          results1.push(simulateSpecificCard(packType1, targetRarity1, needDouble));
+          if (packType2 && targetRarity2 !== null) {
+            results2.push(simulateSpecificCard(packType2, targetRarity2, needDouble));
+          }
+          processed++;
+        }
+
+        // Update progress
+        const progress = Math.round((processed / totalTrials) * 100);
+        $chartContainer.attr('data-progress', `Simulating... ${progress}%`);
+        $progressBar.css('width', `${progress}%`).attr('aria-valuenow', progress);
+
+        if (processed < totalTrials) {
+          setTimeout(processBatch, 0);
+        } else {
+          // Calculate statistics for rarity 1
+          const sortedResults1 = [...results1].sort((a, b) => a - b);
+          const avg1 = Math.round(results1.reduce((a, b) => a + b) / results1.length);
+          const median1 = Math.round(sortedResults1[Math.floor(sortedResults1.length / 2)]);
+          const min1 = Math.min(...results1);
+          const max1 = Math.max(...results1);
+
+          // Update rarity 1 statistics
+          $('#avgPacksSpecific1').text(avg1);
+          $('#medianPacksSpecific1').text(median1);
+          $('#minPacksSpecific1').text(min1);
+          $('#maxPacksSpecific1').text(max1);
+
+          if (packType2 && targetRarity2 !== null) {
+            // Calculate statistics for rarity 2
+            const sortedResults2 = [...results2].sort((a, b) => a - b);
+            const avg2 = Math.round(results2.reduce((a, b) => a + b) / results2.length);
+            const median2 = Math.round(sortedResults2[Math.floor(sortedResults2.length / 2)]);
+            const min2 = Math.min(...results2);
+            const max2 = Math.max(...results2);
+
+            // Update rarity 2 statistics
+            $('#avgPacksSpecific2').text(avg2);
+            $('#medianPacksSpecific2').text(median2);
+            $('#minPacksSpecific2').text(min2);
+            $('#maxPacksSpecific2').text(max2);
+            $stats2Container.show();
+          } else {
+            $stats2Container.hide();
+          }
+
+          // Remove loading state and update chart
+          $chartContainer.removeClass('loading');
+          updateSpecificChart(results1, targetRarity1, targetRarity2 !== null ? results2 : null, targetRarity2);
+        }
+      }
+
+      // Start processing batches
+      processBatch();
+    }, 50);
+  });
+}
+
+export function initializeGoldCalculator() {
+  $('#calculateGoldBtn').on('click', function() {
+    const targetPacks = parseInt($('#targetPacks').val());
+    const currency = $('#currency').val();
+    const goldPerPack = 6;
+
+    // Plan A: Suggested single package
+    const totalGold = targetPacks * goldPerPack;
+    const suggestion = findOptimalGoldPackage(totalGold);
+    const suggestedGold = suggestion.gold;
+    const suggestedCount = suggestion.count;
+    const suggestedPrice = gold_price[currency][suggestedGold] * suggestedCount;
+    const packsFromSuggested = Math.floor((suggestedGold * suggestedCount) / goldPerPack);
+    const avgSuggestedPrice = suggestedPrice / packsFromSuggested;
+    const extraPacks = packsFromSuggested - targetPacks;
+
+    // Plan B: Exact gold needed
+    const plan = calculateOptimalGoldPurchase(totalGold, currency);
+    const avgExactPrice = plan.totalCost / targetPacks;
+
+    // Update Plan A results
+    $('#planAGold').text(suggestedCount > 1 ?
+      `${suggestedCount}x ${suggestedGold} Gold` :
+      `${suggestedGold} Gold`);
+    $('#planACost').text(`${currency} ${suggestedPrice.toFixed(2)}`);
+    $('#planAPacks').text(packsFromSuggested);
+    $('#planAPerPack').text(`${currency} ${avgSuggestedPrice.toFixed(2)}`);
+    $('#planAExtra').text(`+${extraPacks} packs`);
+
+    // Update Plan B results
+    $('#planBGold').text(`${totalGold} Gold`);
+    $('#planBCost').text(`${currency} ${plan.totalCost.toFixed(2)}`);
+    $('#planBPacks').text(targetPacks);
+    $('#planBPerPack').text(`${currency} ${avgExactPrice.toFixed(2)}`);
+
+    // Update Plan B purchase list
+    const $planB = $('#planBPurchases').empty();
+    Object.entries(plan.purchases).sort((a, b) => b[0] - a[0]).forEach(([gold, count]) => {
+      const cost = gold_price[currency][gold];
+      $planB.append(`
+        <li class="mb-2">
+          ${count}x ${gold} Gold (${currency} ${cost.toFixed(2)} each)
+        </li>
+      `);
+    });
+  });
+}
